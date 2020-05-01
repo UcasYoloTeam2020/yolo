@@ -10,8 +10,7 @@ import torchvision.models as tvmodel
 from torch.utils.data import Dataset, DataLoader, TensorDataset
 # 从train.py 调用
 from train import VOC2007,YOLOv1_resnet,calculate_iou
-
-
+import pdb #DeBUG TOOL
 #为了加快计算，只用了7类，
 CLASSES = ['person', 'bird', 'cat', 'cow', 'dog', 'horse', 'sheep']
 #CLASSES = ['person', 'bird', 'cat', 'cow', 'dog', 'horse', 'sheep',
@@ -19,8 +18,9 @@ CLASSES = ['person', 'bird', 'cat', 'cow', 'dog', 'horse', 'sheep']
 #           'bottle', 'chair', 'dining table', 'potted plant', 'sofa', 'tvmonitor']
 
 DATASET_PATH = 'VOCdevkit/VOC2007/'
+PRED_PATH='Pred_img/'
 NUM_BBOX = 2
-
+#
 
     
 # 注意检查一下输入数据的格式，到底是xywh还是xyxy
@@ -33,9 +33,11 @@ def labels2bbox(matrix):
     if matrix.size()[0:2]!=(7,7):
         raise ValueError("Error: Wrong labels size:",matrix.size())
     bbox = torch.zeros((98,5+len(CLASSES)))
+    # pdb.set_trace()
     # 先把7*7*30的数据转变为bbox的(98,25)的格式，其中，bbox信息格式从(px,py,w,h)转换为(x1,y1,x2,y2),方便计算iou
     for i in range(7):  # i是网格的行方向(y方向)
         for j in range(7):  # j是网格的列方向(x方向)
+            #格式调整--》  BBOX 格式【x1,y1,x2,y2,c1;x1,y1,x2,y2,c2]
             bbox[2*(i*7+j),0:4] = torch.Tensor([(matrix[i, j, 0] + j) / 7 - matrix[i, j, 2] / 2,
                                                 (matrix[i, j, 1] + i) / 7 - matrix[i, j, 3] / 2,
                                                 (matrix[i, j, 0] + j) / 7 + matrix[i, j, 2] / 2,
@@ -59,10 +61,15 @@ def NMS(bbox, conf_thresh=0.1, iou_thresh=0.3):
     n = bbox.size()[0]
     bbox_prob = bbox[:,5:].clone()  # 类别预测的条件概率
     bbox_confi = bbox[:, 4].clone().unsqueeze(1).expand_as(bbox_prob)  # 预测置信度
+    # pdb.set_trace?()
     bbox_cls_spec_conf = bbox_confi*bbox_prob  # 置信度*类别条件概率=cls-specific confidence score整合了是否有物体及是什么物体的两种信息
     bbox_cls_spec_conf[bbox_cls_spec_conf<=conf_thresh] = 0  # 将低于阈值的bbox忽略
     for c in range(len(CLASSES)):
-        rank = torch.sort(bbox_cls_spec_conf[:,c],descending=True).indices
+        try:
+             # rank = torch.sort(bbox_cls_spec_conf[:,c],descending=True).indices
+            rank = torch.sort(bbox_cls_spec_conf[:,c],descending=True)[1]#indices torch 0.4.0 修改为【1]
+        except:
+           pdb.set_trace()
         for i in range(98):
             if bbox_cls_spec_conf[rank[i],c]!=0:
                 for j in range(i+1,98):
@@ -70,12 +77,17 @@ def NMS(bbox, conf_thresh=0.1, iou_thresh=0.3):
                         iou = calculate_iou(bbox[rank[i],0:4],bbox[rank[j],0:4])
                         if iou > iou_thresh:  # 根据iou进行非极大值抑制抑制
                             bbox_cls_spec_conf[rank[j],c] = 0
-    bbox = bbox[torch.max(bbox_cls_spec_conf,dim=1).values>0]  # 将20个类别中最大的cls-specific confidence score为0的bbox都排除
-    bbox_cls_spec_conf = bbox_cls_spec_conf[torch.max(bbox_cls_spec_conf,dim=1).values>0]
+    # bbox = bbox[torch.max(bbox_cls_spec_conf,dim=1).values>0]  # 将20个类别中最大的cls-specific confidence score为0的bbox都排除
+    bbox = bbox[torch.max(bbox_cls_spec_conf,dim=1)[0]>0]        #torch 0.4.0 torch.max 无values索引，更改按下标索引
+    # bbox_cls_spec_conf = bbox_cls_spec_conf[torch.max(bbox_cls_spec_conf,dim=1).values>0]
+    bbox_cls_spec_conf = bbox_cls_spec_conf[torch.max(bbox_cls_spec_conf,dim=1)[0]>0] #torch 0.4.0 torch.max 无values索引，更改按下标索引
     res = torch.ones((bbox.size()[0],6))
-    res[:,1:5] = bbox[:,0:4]  # 储存最后的bbox坐标信息
-    res[:,0] = torch.argmax(bbox[:,5:],dim=1).int()  # 储存bbox对应的类别信息
-    res[:,5] = torch.max(bbox_cls_spec_conf,dim=1).values  # 储存bbox对应的class-specific confidence scores
+    try:
+        res[:,1:5] = bbox[:,0:4]  # 储存最后的bbox坐标信息
+        res[:,0] = torch.argmax(bbox[:,5:],dim=1).int()  # 储存bbox对应的类别信息
+        res[:,5] = torch.max(bbox_cls_spec_conf,dim=1)[0] # 储存bbox对应的class-specific confidence scores
+    except:
+        pass  #未检测到目标
     return res
 
 COLOR = [(255,0,0),(255,125,0),(255,255,0),(255,0,125),(255,0,250),
@@ -91,7 +103,10 @@ def draw_bbox(img,bbox):
     """
     h,w = img.shape[0:2]
     n = bbox.size()[0]
-    print(bbox)
+    if n==0:
+        return img
+    # pdb.set_trace()
+    # print(bbox)
     for i in range(n):
         if bbox[i,1] > 1:
             bbox[i,1] = 1
@@ -108,15 +123,18 @@ def draw_bbox(img,bbox):
         confidence = bbox[i,5]
         cv2.rectangle(img,p1,p2,color=COLOR[int(bbox[i,0])])
         cv2.putText(img,cls_name,p1,cv2.FONT_HERSHEY_SIMPLEX,0.5,(0,0,255))
-    cv2.imshow("bbox",img)
-    cv2.waitKey(0)
-
+    
+    # cv2.imshow("bbox",img)
+    # cv2.waitKey(0)
+    return img
 
 if __name__ == '__main__':
     val_dataloader = DataLoader(VOC2007(is_train=False), batch_size=1, shuffle=False)
     model = torch.load("./models_pkl/YOLOv1_epoch40.pkl")  # 加载训练好的模型
-    for i,(inputs,labels) in enumerate(val_dataloader):
+    for i,(inputs,labels,filename) in enumerate(val_dataloader):
+        # print(filename)
         inputs = inputs.cuda()
+        # pdb.set_trace()
         # 以下代码是测试labels2bbox函数的时候再用
         # labels = labels.float().cuda()
         # labels = labels.squeeze(dim=0)
@@ -132,6 +150,10 @@ if __name__ == '__main__':
         img = inputs.cpu().numpy()
         img = 255*img  # 将图像的数值从(0,1)映射到(0,255)并转为非负整形
         img = img.astype(np.uint8)
-        draw_bbox(img,bbox.cpu())  # 将网络预测结果进行可视化，将bbox画在原图中，可以很直观的观察结果
-        print(bbox.size(),bbox)
-        input()
+        img_bbox=draw_bbox(img,bbox.cpu()) 
+        # pdb.set_trace() # 输出带有bbox的img图像
+
+        cv2.imwrite(PRED_PATH+(str(filename)[2:-3]+'pre.jpg').rjust(13,'0'),img_bbox)
+        print("测试图片 %s"%(filename))
+        # print(bbox.size(),bbox)
+        # input()

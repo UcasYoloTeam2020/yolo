@@ -49,6 +49,7 @@ class VOC2007(Dataset):
         else:
             with open(DATASET_PATH + "ImageSets/Main/val.txt", 'r') as f:
                 self.filenames = [x.strip() for x in f]
+                # print(filenames)
         self.imgpath = DATASET_PATH + "JPEGImages/"  # 原始图像所在的路径
         self.labelpath = DATASET_PATH + "labels/"  # 图像对应的label文件(.txt文件)的路径
         self.is_aug = is_aug
@@ -96,7 +97,9 @@ class VOC2007(Dataset):
         labels = convert_bbox2labels(bbox)  # 将所有bbox的(cls,x,y,w,h)数据转换为训练时方便计算Loss的数据形式(7,7,5*B+cls_num)
         # 此处可以写代码验证一下，经过convert_bbox2labels函数后得到的labels变量中储存的数据是否正确
         labels = transforms.ToTensor()(labels)
-        return img,labels
+        # print(type(self.filenames[item]))
+        filename=self.filenames[item]
+        return img,labels,filename
 
 
 
@@ -272,7 +275,7 @@ if __name__ == '__main__':
         # 如果要可视化，下面这行要取消注释
         # yl = torch.Tensor([0]).cuda()
         
-        for i,(inputs,labels) in enumerate(train_dataloader):
+        for i,(inputs,labels,filename) in enumerate(train_dataloader):
 
             # 用gpu
             inputs = inputs.cuda()
