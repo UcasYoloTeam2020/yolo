@@ -15,9 +15,9 @@ import torch
 import torch.nn as nn
 import torchvision.models as tvmodel
 from torch.utils.data import Dataset, DataLoader, TensorDataset
-import tqdm
 import time
 import pdb #debug tool
+# import Exception #
 DATASET_PATH = 'VOCdevkit/VOC2007/'
 NUM_BBOX = 2
 
@@ -29,6 +29,9 @@ def convert_bbox2labels(bbox):
     for i in range(len(bbox)//5):
         gridx = int(bbox[i*5+1] // gridsize)  # 当前bbox中心落在第gridx个网格,列
         gridy = int(bbox[i*5+2] // gridsize)  # 当前bbox中心落在第gridy个网格,行
+        if gridx>=7 or gridy>=7:
+            print('bbox 中心在边框')#随机裁剪造成的 bbox中心在图像边缘，为无效数据
+            return None
         # (bbox中心坐标 - 网格左上角点的坐标)/网格大小  ==> bbox中心点的相对位置
         gridpx = bbox[i * 5 + 1] / gridsize - gridx
         gridpy = bbox[i * 5 + 2] / gridsize - gridy
@@ -37,7 +40,10 @@ def convert_bbox2labels(bbox):
         labels[gridy, gridx, 5:10] = np.array([gridpx, gridpy, bbox[i * 5 + 3], bbox[i * 5 + 4], 1])
         labels[gridy, gridx, 10+int(bbox[i*5])] = 1
     return labels
-
+def my_collate(batch):
+    "Puts each data field into a tensor with outer dimension batch size"
+    batch = list(filter(lambda x : x is not None, batch))
+    return default_collate(batch)
 class VOC2007(Dataset):
     def __init__(self,is_train=True,is_aug=True):
         """
@@ -62,10 +68,8 @@ class VOC2007(Dataset):
 
     def __getitem__(self, item):
         
-        try:
-         img = cv2.imread(self.imgpath+self.filenames[item]+".jpg")  # 读取原始图像
-        except:
-         pdb.set_trace() #debug
+     try:
+        img = cv2.imread(self.imgpath+self.filenames[item]+".jpg")  # 读取原始图像
         h,w = img.shape[0:2]
         input_size = 448  # 输入YOLOv1网络的图像尺寸为448x448
         # 因为数据集内原始图像的尺寸是不定的，所以需要进行适当的padding，将原始图像padding成宽高一致的正方形
@@ -106,6 +110,8 @@ class VOC2007(Dataset):
         labels = transforms.ToTensor()(labels)
         filename=self.filenames[item]
         return img,labels,filename
+     except:
+        pdb.set_trace() #debug
 
 
 
@@ -283,35 +289,40 @@ if __name__ == '__main__':
         # yl = torch.Tensor([0]).cuda()
         
         # for i,(inputs,labels,filename) in enumerate(tqdm(train_dataloader)):
+        
         for i,(inputs,labels,filename) in enumerate(train_dataloader):
-            # 用gpu
-            inputs = inputs.cuda()
-            labels = labels.float().cuda()
-            
-            #用 cpu
-            # inputs = inputs
-            # labels = labels.float()
+            try:
+                # 用gpu
+                inputs = inputs.cuda()
+                labels = labels.float().cuda()
+                
+                #用 cpu
+                # inputs = inputs
+                # labels = labels.float()
 
-            pred = model(inputs)
+                pred = model(inputs)
 
-            loss = criterion(pred, labels)
-            optimizer.zero_grad()
-            loss.backward()
-            optimizer.step()
-#            print(torch.isnan(loss))
-            print("Epoch %d/%d| Step %d/%d| Loss: %.2f"%(e,epoch,i,len(train_data)//batchsize,loss))
-            assert not torch.isnan(loss).any()
-             # import pdb;pdb.set_trace()
-
+                loss = criterion(pred, labels)
+                optimizer.zero_grad()
+                loss.backward()
+                optimizer.step()
+    #            print(torch.isnan(loss))
+                print("Epoch %d/%d| Step %d/%d| Loss: %.2f"%(e,epoch,i,len(train_data)//batchsize,loss))
+                assert not torch.isnan(loss).any()
+                 # import pdb;pdb.set_trace()
+            except Exception as e:
+                   print(e)
+                   pdb.set_trace()
             """
-            # 如果要可视化，下面这段要取消注释
-            yl = yl + loss
-            if is_vis and (i+1)%100==0:
-                vis.line(np.array([yl.cpu().item()/(i+1)]),np.array([i+e*len(train_data)//batchsize]),win=viswin1,update='append')
+                # 如果要可视化，下面这段要取消注释
+                yl = yl + loss
+                if is_vis and (i+1)%100==0:
+                    vis.line(np.array([yl.cpu().item()/(i+1)]),np.array([i+e*len(train_data)//batchsize]),win=viswin1,update='append')
             """
         print("epoch %d : loss %.4f"%(e,loss),file=trainlog)    
         if (e+1)%10==0:
-            torch.save(model,"./models_pkl/YOLOv1_DataAug_epoch"+str(e+1)+".pkl")
-            print(time.strftime('%Y-%m-%d %H:%m',time.localtime(time.time())),file=trainlog)
-            # compute_val_map(model)
+                torch.save(model,"./models_pkl/YOLOv1_DataAug_epoch"+str(e+1)+".pkl")
+                print(time.strftime('%Y-%m-%d %H:%m',time.localtime(time.time())),file=trainlog)
+                # compute_val_map(model)
+
 

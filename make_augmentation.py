@@ -128,6 +128,7 @@ class DataAugmentation:
             bbox_temp = bbox.copy()
             img_temp = img.copy()
             img_temp, bbox_temp = self.rand_crop(img_temp, bbox_temp)
+            # import pdb;pdb.set_trace()
             save_name = filenames[item] + "_crop"
             self.save_img(img_temp, bbox_temp, save_name)
             file_list.append(save_name)
@@ -155,9 +156,9 @@ class DataAugmentation:
     # 翻转
     def rand_flip(self, im, boxes):
         # 做上下和左右翻转
-        im[:, :, 0] = np.flip(im[:, :, 0]).copy()
-        im[:, :, 1] = np.flip(im[:, :, 1]).copy()
-        im[:, :, 2] = np.flip(im[:, :, 2]).copy()
+        im[:, :, 0] = np.flip(im[:, :, 0],1).copy()
+        im[:, :, 1] = np.flip(im[:, :, 1],1).copy()
+        im[:, :, 2] = np.flip(im[:, :, 2],1).copy()
         h, w, _ = im.shape
         # boxes按1维的方式储存，每5个元素表示一个bbox的(cls,xc,yc,w,h)
         for i in range(len(boxes) // 5):
@@ -262,7 +263,7 @@ class DataAugmentation:
             boxes_crop[i, 3] = rd_crop[i, 1] - lr_crop[i, 1]
             boxes_crop[i, 0] = (rd_crop[i, 0] + lr_crop[i, 0]) / 2.0
             boxes_crop[i, 1] = (rd_crop[i, 1] + lr_crop[i, 1]) / 2.0
-
+        # import pdb;pdb.
         img_crop = im[int(rand_y * h):int((rand_y + rand_h) * h), int(rand_x * w):int((rand_x + rand_w) * w)]
         labeles_crop = labeles_crop.reshape(-1, 1)
         temp = torch.cat((labeles_crop, boxes_crop), 1).tolist()
