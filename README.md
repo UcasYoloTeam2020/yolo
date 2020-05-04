@@ -8,5 +8,13 @@
 5. 如果之后要加数据，只要改数据文件，并把 .py 里的CLASSES改为对应的类别就可以。并且要用xmlToLabels.py把xml的标注文件变为VOCdevkit\VOC2007\labels 里的对应txt文件。同时，重新对数据进行划分，放在VOCdevkit\VOC2007\ImageSets\Main里的train.txt和val.txt。
 ## 代码测试说明 from 姚东盼
    torch 版本： 0。4.1
-   
-
+## 数据增广说明  
+### 作用  
+生成增广后的图片数据及其标签文件  
+### 运行方式  
+`当前路径下运行make_augmentation.py`  
+- 增广后的图片存储在VOCdevkit\VOC2007\JPEGImages_augmentation  
+- 增广后的标签存储在VOCdevkit\VOC2007\labels_augmentation  
+- 增广后的训练集、测试集图片名称文件存储在VOCdevkit\VOC2007\ImageSets\Main\train_augmentation.txt、VOCdevkit\VOC2007\ImageSets\Main\val_augmentation.txt  
+### 对应的修改  
+`若使用增广数据，需将train.py及test.py中的图片路径、标签路径、图片名称路径替换为增广后的路径`
