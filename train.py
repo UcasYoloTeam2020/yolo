@@ -17,7 +17,7 @@ import torchvision.models as tvmodel
 from torch.utils.data import Dataset, DataLoader, TensorDataset
 from torch.utils.data.dataloader import default_collate
 import time
-import pdb #debug tool
+# import pdb #debug tool
 # import Exception #
 DATASET_PATH = 'VOCdevkit/VOC2007/'
 NUM_BBOX = 2
@@ -30,9 +30,8 @@ def convert_bbox2labels(bbox):
     for i in range(len(bbox)//5):
         gridx = int(bbox[i*5+1] // gridsize)  # 当前bbox中心落在第gridx个网格,列
         gridy = int(bbox[i*5+2] // gridsize)  # 当前bbox中心落在第gridy个网格,行
-        if gridx>=7 or gridy>=7:
-                     
-            return None  #随机裁剪造成的 bbox中心在图像边缘，为无效数据
+        if gridx>=7 or gridy>=7:        
+            return None          #随机裁剪造成的 bbox中心在图像边缘，为无效数据
         # (bbox中心坐标 - 网格左上角点的坐标)/网格大小  ==> bbox中心点的相对位置
         gridpx = bbox[i * 5 + 1] / gridsize - gridx
         gridpy = bbox[i * 5 + 2] / gridsize - gridy
@@ -42,9 +41,9 @@ def convert_bbox2labels(bbox):
         labels[gridy, gridx, 10+int(bbox[i*5])] = 1
     return labels
 def my_collate(batch):
+    #剔除cinvert_bbox2中 label置为None的数据
     "Puts each data field into a tensor with outer dimension batch size"
-    # print(batch)
-    # pdb.set_trace()
+
     batch = [(img,labels,filename) for (img,labels,filename) in batch if labels is not None]
     if batch==[]:
       return (None,None,None)
@@ -66,14 +65,13 @@ class VOC2007(Dataset):
         self.imgpath = DATASET_PATH + "JPEGImages_augmentation/"  # 原始图像所在的路径
         self.labelpath = DATASET_PATH + "labels_augmentation/"  # 图像对应的label文件(.txt文件)的路径
         self.is_aug = is_aug
-        # print(self.filenames)
+
 
     def __len__(self):
         return len(self.filenames)
 
     def __getitem__(self, item):
         
-     # try:
         img = cv2.imread(self.imgpath+self.filenames[item]+".jpg")  # 读取原始图像
         h,w = img.shape[0:2]
         input_size = 448  # 输入YOLOv1网络的图像尺寸为448x448
@@ -117,8 +115,6 @@ class VOC2007(Dataset):
         labels = transforms.ToTensor()(labels)
         filename=self.filenames[item]
         return img,labels,filename
-     # except:
-        pdb.set_trace() #debug
 
 
 
@@ -204,10 +200,6 @@ class Loss_yolov1(nn.Module):
         return loss/n
 
 
-
-
-
-
 class YOLOv1_resnet(nn.Module):
     def __init__(self):
         super(YOLOv1_resnet,self).__init__()
@@ -258,12 +250,12 @@ class YOLOv1_resnet(nn.Module):
 
 if __name__ == '__main__':
 	 #设置使用的gpu
-    # os.environ['CUDA_VISIBLE_DEVICES']='0'
+    os.environ['CUDA_VISIBLE_DEVICES']='0'
 
     epoch = 50
-    batchsize = 10
-    lr = 0.0001
-
+    batchsize = 32
+    lr = 0.00001
+    print(batchsize)
     train_data = VOC2007()
     train_dataloader = DataLoader(VOC2007(is_train=True),batch_size=batchsize,collate_fn=my_collate,shuffle=True)
     # pdb.set_trace()
@@ -298,11 +290,8 @@ if __name__ == '__main__':
         # for i,(inputs,labels,filename) in enumerate(tqdm(train_dataloader)):
         
         for i,(inputs,labels,filename) in enumerate(train_dataloader):
-            # try:
             # 用gpu
-            if labels is None :
-              print('bbox 中心在边框')
-              continue
+         try:
             inputs = inputs.cuda()
             labels = labels.float().cuda()
             
@@ -316,19 +305,18 @@ if __name__ == '__main__':
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
-#            print(torch.isnan(loss))
-            if i%10==0:print("Epoch %d/%d| Step %d/%d| Loss: %.2f"%(e,epoch,i,len(train_data)//batchsize,loss))
+            print("Epoch %d/%d| Step %d/%d| Loss: %.2f"%(e,epoch,i,len(train_data)//batchsize,loss))
             assert not torch.isnan(loss).any()
-             # import pdb;pdb.set_trace()
-            # except Exception as e:
-            # print(e)
-               # pdb.set_trace()
+
             """
             # 如果要可视化，下面这段要取消注释
             yl = yl + loss
             if is_vis and (i+1)%100==0:
                 vis.line(np.array([yl.cpu().item()/(i+1)]),np.array([i+e*len(train_data)//batchsize]),win=viswin1,update='append')
             """
+         except:
+            torch.save(model,"./models_pkl/YOLOv1_DataAug_epoch"+str(e+1)+".pkl")
+            print(time.strftime('%Y-%m-%d %H:%m',time.localtime(time.time())),file=trainlog)
         print("epoch %d : loss %.4f"%(e,loss),file=trainlog)    
         if (e+1)%10==0:
                 torch.save(model,"./models_pkl/YOLOv1_DataAug_epoch"+str(e+1)+".pkl")
