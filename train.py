@@ -52,15 +52,20 @@ class VOC2007(Dataset):
             with open(DATASET_PATH + "ImageSets/Main/val_augmentation.txt", 'r') as f:
                 self.filenames = [x.strip() for x in f]
                 # print(filenames)
-        self.imgpath = DATASET_PATH + "JPEGImages/"  # 原始图像所在的路径
-        self.labelpath = DATASET_PATH + "labels/"  # 图像对应的label文件(.txt文件)的路径
+        self.imgpath = DATASET_PATH + "JPEGImages_augmentation/"  # 原始图像所在的路径
+        self.labelpath = DATASET_PATH + "labels_augmentation/"  # 图像对应的label文件(.txt文件)的路径
         self.is_aug = is_aug
+        # print(self.filenames)
 
     def __len__(self):
         return len(self.filenames)
 
     def __getitem__(self, item):
-        img = cv2.imread(self.imgpath+self.filenames[item]+".jpg")  # 读取原始图像
+        
+        try:
+         img = cv2.imread(self.imgpath+self.filenames[item]+".jpg")  # 读取原始图像
+        except:
+         pdb.set_trace() #debug
         h,w = img.shape[0:2]
         input_size = 448  # 输入YOLOv1网络的图像尺寸为448x448
         # 因为数据集内原始图像的尺寸是不定的，所以需要进行适当的padding，将原始图像padding成宽高一致的正方形
@@ -99,9 +104,7 @@ class VOC2007(Dataset):
         labels = convert_bbox2labels(bbox)  # 将所有bbox的(cls,x,y,w,h)数据转换为训练时方便计算Loss的数据形式(7,7,5*B+cls_num)
         # 此处可以写代码验证一下，经过convert_bbox2labels函数后得到的labels变量中储存的数据是否正确
         labels = transforms.ToTensor()(labels)
-        print(type(self.filenames[item]))
         filename=self.filenames[item]
-        # img,labels,filename
         return img,labels,filename
 
 
@@ -250,13 +253,13 @@ if __name__ == '__main__':
 
     train_data = VOC2007()
     train_dataloader = DataLoader(VOC2007(is_train=True),batch_size=batchsize,shuffle=True)
-    
+    # pdb.set_trace()
     #用cpu训练
     # model = YOLOv1_resnet()
     
     #用gpu训练
-    model = YOLOv1_resnet().cuda()
-    
+    # model = YOLOv1_resnet().cuda()
+    model = torch.load("./models_pkl/YOLOv1_epoch50.pkl")
     # model.children()里是按模块(Sequential)提取的子模块，而不是具体到每个层，具体可以参见pytorch帮助文档
     # 冻结resnet34特征提取层，特征提取层不参与参数更新
     for layer in model.children():
@@ -272,7 +275,7 @@ if __name__ == '__main__':
         viswin1 = vis.line(np.array([0.]),np.array([0.]),opts=dict(title="Loss/Step",xlabel="100*step",ylabel="Loss"))
     """
     trainlog = open('train.log', mode = 'a',encoding='utf-8')
-    print(print(time.strftime('%Y-%m-%d %H:%m',time.localtime(time.time()))),file=trainlog)
+    print(time.strftime('%Y-%m-%d %H:%m',time.localtime(time.time())),file=trainlog)
     for e in range(epoch):
         model.train()
         
@@ -281,8 +284,6 @@ if __name__ == '__main__':
         
         # for i,(inputs,labels,filename) in enumerate(tqdm(train_dataloader)):
         for i,(inputs,labels,filename) in enumerate(train_dataloader):
-            pdb.set_trace()
-
             # 用gpu
             inputs = inputs.cuda()
             labels = labels.float().cuda()
@@ -298,7 +299,7 @@ if __name__ == '__main__':
             loss.backward()
             optimizer.step()
 #            print(torch.isnan(loss))
-            # print("Epoch %d/%d| Step %d/%d| Loss: %.2f"%(e,epoch,i,len(train_data)//batchsize,loss))
+            print("Epoch %d/%d| Step %d/%d| Loss: %.2f"%(e,epoch,i,len(train_data)//batchsize,loss))
             assert not torch.isnan(loss).any()
              # import pdb;pdb.set_trace()
 
