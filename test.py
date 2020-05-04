@@ -19,6 +19,7 @@ CLASSES = ['person', 'bird', 'cat', 'cow', 'dog', 'horse', 'sheep']
 
 DATASET_PATH = 'VOCdevkit/VOC2007/'
 PRED_PATH='Pred_img/'
+Pre_Train='Train_pre/'
 NUM_BBOX = 2
 #
 
@@ -119,6 +120,7 @@ def draw_bbox(img,bbox):
             
         p1 = (int(w*bbox[i,1]), int(h*bbox[i,2]))
         p2 = (int(w*bbox[i,3]), int(h*bbox[i,4]))
+        # pdb.set_trace()
         cls_name = CLASSES[int(bbox[i,0])]
         confidence = bbox[i,5]
         cv2.rectangle(img,p1,p2,color=COLOR[int(bbox[i,0])])
@@ -129,8 +131,8 @@ def draw_bbox(img,bbox):
     return img
 
 if __name__ == '__main__':
-    val_dataloader = DataLoader(VOC2007(is_train=False), batch_size=1, shuffle=False)
-    model = torch.load("./models_pkl/YOLOv1_epoch40.pkl")  # 加载训练好的模型
+    val_dataloader = DataLoader(VOC2007(is_train=True), batch_size=1, shuffle=False)
+    model = torch.load("./models_pkl/YOLOv1_epoch50.pkl")  # 加载训练好的模型
     for i,(inputs,labels,filename) in enumerate(val_dataloader):
         # print(filename)
         inputs = inputs.cuda()
@@ -139,12 +141,14 @@ if __name__ == '__main__':
         # labels = labels.float().cuda()
         # labels = labels.squeeze(dim=0)
         # labels = labels.permute((1,2,0))
+        # bbox = labels2bbox(labels)
         pred = model(inputs)  # pred的尺寸是(1,30,7,7)
         pred = pred.squeeze(dim=0)  # 压缩为(30,7,7)
         pred = pred.permute((1,2,0))  # 转换为(7,7,30)
 
-        ## 测试labels2bbox时，使用 labels作为labels2bbox2函数的输入
+        # ## 测试labels2bbox时，使用 labels作为labels2bbox2函数的输入
         bbox = labels2bbox(pred)  # 此处可以用labels代替pred，测试一下输出的bbox是否和标签一样，从而检查labels2bbox函数是否正确。当然，还要注意将数据集改成训练集而不是测试集，因为测试集没有labels。
+        # import pdb;pdb.set_trace()
         inputs = inputs.squeeze(dim=0)  # 输入图像的尺寸是(1,3,448,448),压缩为(3,448,448)
         inputs = inputs.permute((1,2,0))  # 转换为(448,448,3)
         img = inputs.cpu().numpy()
@@ -153,7 +157,9 @@ if __name__ == '__main__':
         img_bbox=draw_bbox(img,bbox.cpu()) 
         # pdb.set_trace() # 输出带有bbox的img图像
 
-        cv2.imwrite(PRED_PATH+(str(filename)[2:-3]+'pre.jpg').rjust(13,'0'),img_bbox)
+        cv2.imwrite(Pre_Train+(str(filename)[2:-3]+'pre_50.jpg').rjust(13,'0'),img_bbox)
         print("测试图片 %s"%(filename))
+        if i>50:
+            break
         # print(bbox.size(),bbox)
         # input()
