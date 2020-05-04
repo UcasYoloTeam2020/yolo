@@ -131,7 +131,8 @@ def draw_bbox(img,bbox):
     return img
 
 if __name__ == '__main__':
-    val_dataloader = DataLoader(VOC2007(is_train=True), batch_size=1, shuffle=False)
+    Train=True  #测试训练集
+    val_dataloader = DataLoader(VOC2007(is_train=Train), batch_size=1, shuffle=False)
     model = torch.load("./models_pkl/YOLOv1_epoch50.pkl")  # 加载训练好的模型
     for i,(inputs,labels,filename) in enumerate(val_dataloader):
         # print(filename)
@@ -159,7 +160,7 @@ if __name__ == '__main__':
 
         cv2.imwrite(Pre_Train+(str(filename)[2:-3]+'pre_50.jpg').rjust(13,'0'),img_bbox)
         print("测试图片 %s"%(filename))
-        if i>50:
+        if i>50: #测试50p训练图片
             break
         # print(bbox.size(),bbox)
         # input()
