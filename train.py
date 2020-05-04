@@ -15,7 +15,9 @@ import torch
 import torch.nn as nn
 import torchvision.models as tvmodel
 from torch.utils.data import Dataset, DataLoader, TensorDataset
-
+import tqdm
+import time
+import pdb #debug tool
 DATASET_PATH = 'VOCdevkit/VOC2007/'
 NUM_BBOX = 2
 
@@ -44,10 +46,10 @@ class VOC2007(Dataset):
         """
         self.filenames = []  # 储存数据集的文件名称
         if is_train:
-            with open(DATASET_PATH + "ImageSets/Main/train.txt", 'r') as f: # 调用包含训练集图像名称的txt文件
+            with open(DATASET_PATH + "ImageSets/Main/train_augmentation.txt", 'r') as f: # 调用包含训练集图像名称的txt文件
                 self.filenames = [x.strip() for x in f]
         else:
-            with open(DATASET_PATH + "ImageSets/Main/val.txt", 'r') as f:
+            with open(DATASET_PATH + "ImageSets/Main/val_augmentation.txt", 'r') as f:
                 self.filenames = [x.strip() for x in f]
                 # print(filenames)
         self.imgpath = DATASET_PATH + "JPEGImages/"  # 原始图像所在的路径
@@ -97,8 +99,9 @@ class VOC2007(Dataset):
         labels = convert_bbox2labels(bbox)  # 将所有bbox的(cls,x,y,w,h)数据转换为训练时方便计算Loss的数据形式(7,7,5*B+cls_num)
         # 此处可以写代码验证一下，经过convert_bbox2labels函数后得到的labels变量中储存的数据是否正确
         labels = transforms.ToTensor()(labels)
-        # print(type(self.filenames[item]))
+        print(type(self.filenames[item]))
         filename=self.filenames[item]
+        # img,labels,filename
         return img,labels,filename
 
 
@@ -268,14 +271,17 @@ if __name__ == '__main__':
         vis = visdom.Visdom()
         viswin1 = vis.line(np.array([0.]),np.array([0.]),opts=dict(title="Loss/Step",xlabel="100*step",ylabel="Loss"))
     """
-    
+    trainlog = open('train.log', mode = 'a',encoding='utf-8')
+    print(print(time.strftime('%Y-%m-%d %H:%m',time.localtime(time.time()))),file=trainlog)
     for e in range(epoch):
         model.train()
         
         # 如果要可视化，下面这行要取消注释
         # yl = torch.Tensor([0]).cuda()
         
+        # for i,(inputs,labels,filename) in enumerate(tqdm(train_dataloader)):
         for i,(inputs,labels,filename) in enumerate(train_dataloader):
+            pdb.set_trace()
 
             # 用gpu
             inputs = inputs.cuda()
@@ -292,7 +298,7 @@ if __name__ == '__main__':
             loss.backward()
             optimizer.step()
 #            print(torch.isnan(loss))
-            print("Epoch %d/%d| Step %d/%d| Loss: %.2f"%(e,epoch,i,len(train_data)//batchsize,loss))
+            # print("Epoch %d/%d| Step %d/%d| Loss: %.2f"%(e,epoch,i,len(train_data)//batchsize,loss))
             assert not torch.isnan(loss).any()
              # import pdb;pdb.set_trace()
 
@@ -302,8 +308,9 @@ if __name__ == '__main__':
             if is_vis and (i+1)%100==0:
                 vis.line(np.array([yl.cpu().item()/(i+1)]),np.array([i+e*len(train_data)//batchsize]),win=viswin1,update='append')
             """
-            
+        print("epoch %d : loss %.4f"%(e,loss),file=trainlog)    
         if (e+1)%10==0:
-            torch.save(model,"./models_pkl/YOLOv1_epoch"+str(e+1)+".pkl")
+            torch.save(model,"./models_pkl/YOLOv1_DataAug_epoch"+str(e+1)+".pkl")
+            print(time.strftime('%Y-%m-%d %H:%m',time.localtime(time.time())),file=trainlog)
             # compute_val_map(model)
 
