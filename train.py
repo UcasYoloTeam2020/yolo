@@ -291,7 +291,6 @@ if __name__ == '__main__':
         
         for i,(inputs,labels,filename) in enumerate(train_dataloader):
             # 用gpu
-         try:
             inputs = inputs.cuda()
             labels = labels.float().cuda()
             
@@ -314,9 +313,6 @@ if __name__ == '__main__':
             if is_vis and (i+1)%100==0:
                 vis.line(np.array([yl.cpu().item()/(i+1)]),np.array([i+e*len(train_data)//batchsize]),win=viswin1,update='append')
             """
-         except:
-            torch.save(model,"./models_pkl/YOLOv1_DataAug_epoch"+str(e+1)+".pkl")
-            print(time.strftime('%Y-%m-%d %H:%m',time.localtime(time.time())),file=trainlog)
         print("epoch %d : loss %.4f"%(e,loss),file=trainlog)    
         if (e+1)%10==0:
                 torch.save(model,"./models_pkl/YOLOv1_DataAug_epoch"+str(e+1)+".pkl")
