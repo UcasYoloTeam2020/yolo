@@ -29,5 +29,5 @@
   添加my_collate函数，剔除无效数据。
 2.添加log输出。
 
-## Resnet_dilat文件说明
- 可以直接调用文件中的resnet_dilat函数代替model.resnet32赋值给net
+## Resnet_dilat文件说明from赵千帆
+ 可以直接调用文件中的resnet_dilat函数代替model.resnet32赋值给resnet。
