@@ -28,3 +28,6 @@
 1.增广后个别数据，可能由于随机裁剪原因，部分数据标签的bbox中心在img边缘，宽度为0。程序报错。
   添加my_collate函数，剔除无效数据。
 2.添加log输出。
+
+## Resnet_dilat文件说明
+ 可以直接调用文件中的resnet_dilat函数代替model.resnet32赋值给net
