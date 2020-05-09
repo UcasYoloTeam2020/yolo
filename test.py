@@ -142,6 +142,9 @@ def clr_bbox_path():
   if os.path.exists(BBOX_Pred_Path):
         shutil.rmtree(BBOX_Pred_Path)
   os.mkdir(BBOX_Pred_Path)
+  # if os.path.exists(PRED_PATH):
+  #       shutil.rmtree(PRED_PATH)
+  # os.mkdir(PRED_PATH)
 
 if __name__ == '__main__':
     Train=False  #测试训练集
