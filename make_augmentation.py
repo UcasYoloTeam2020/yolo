@@ -128,7 +128,6 @@ class DataAugmentation:
             bbox_temp = bbox.copy()
             img_temp = img.copy()
             img_temp, bbox_temp = self.rand_crop(img_temp, bbox_temp)
-            # import pdb;pdb.set_trace()
             save_name = filenames[item] + "_crop"
             self.save_img(img_temp, bbox_temp, save_name)
             file_list.append(save_name)
@@ -163,7 +162,7 @@ class DataAugmentation:
         # boxes按1维的方式储存，每5个元素表示一个bbox的(cls,xc,yc,w,h)
         for i in range(len(boxes) // 5):
             boxes[i * 5 + 1] = 1.0 - boxes[i * 5 + 1]
-            boxes[i * 5 + 2] = 1.0 - boxes[i * 5 + 2]
+            # boxes[i * 5 + 2] = 1.0 - boxes[i * 5 + 2]
         return im, boxes
 
         # 缩放，横纵向缩放尺度在0.8-1.2间随机选择
