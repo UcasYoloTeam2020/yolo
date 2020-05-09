@@ -19,6 +19,7 @@ from torch.utils.data.dataloader import default_collate
 import time
 # import pdb #debug tool
 # import Exception #
+
 DATASET_PATH = 'VOCdevkit/VOC2007/'
 NUM_BBOX = 2
 
@@ -59,11 +60,11 @@ class VOC2007(Dataset):
             with open(DATASET_PATH + "ImageSets/Main/train_augmentation.txt", 'r') as f: # 调用包含训练集图像名称的txt文件
                 self.filenames = [x.strip() for x in f]
         else:
-            with open(DATASET_PATH + "ImageSets/Main/val_augmentation.txt", 'r') as f:
+            with open(DATASET_PATH + "ImageSets/Main/val.txt", 'r') as f:
                 self.filenames = [x.strip() for x in f]
                 # print(filenames)
         self.imgpath = DATASET_PATH + "JPEGImages_augmentation/"  # 原始图像所在的路径
-        self.labelpath = DATASET_PATH + "labels_augmentation/"  # 图像对应的label文件(.txt文件)的路径
+        self.labelpath = DATASET_PATH + "labels/"  # 图像对应的label文件(.txt文件)的路径
         self.is_aug = is_aug
 
 
@@ -213,6 +214,7 @@ class YOLOv1_resnet(nn.Module):
         resnet.load_state_dict(torch.load('./models_pkl/resnet34-333f7ec4.pth'),False)
 
         resnet_out_channel = resnet.fc.in_features  # 记录resnet全连接层之前的网络输出通道数，方便连入后续卷积网络中
+
         self.resnet = nn.Sequential(*list(resnet.children())[:-2])  # 去除resnet的最后两层
         # 以下是YOLOv1的最后四个卷积层
         self.Conv_layers = nn.Sequential(
@@ -250,12 +252,14 @@ class YOLOv1_resnet(nn.Module):
 
 if __name__ == '__main__':
 	 #设置使用的gpu
-    os.environ['CUDA_VISIBLE_DEVICES']='0'
+    os.environ['CUDA_VISIBLE_DEVICES']='0'   
+    trainlog = open('train.log', mode = 'a',encoding='utf-8')
+    print(time.strftime('%Y-%m-%d %H:%m',time.localtime(time.time())),file=trainlog)
 
     epoch = 50
     batchsize = 32
-    lr = 0.00001
-    print(batchsize)
+    lr = 0.000005
+    print("BatchSize:  %d  , lr : %d "%(batchsize,lr),file=trainlog)
     train_data = VOC2007()
     train_dataloader = DataLoader(VOC2007(is_train=True),batch_size=batchsize,collate_fn=my_collate,shuffle=True)
     # pdb.set_trace()
@@ -263,8 +267,8 @@ if __name__ == '__main__':
     # model = YOLOv1_resnet()
     
     #用gpu训练
-    # model = YOLOv1_resnet().cuda()
-    model = torch.load("./models_pkl/YOLOv1_epoch50.pkl")
+    model = YOLOv1_resnet().cuda()
+    model = torch.load("./models_pkl/YOLOv1_DataAug_epoch10.pkl")
     # model.children()里是按模块(Sequential)提取的子模块，而不是具体到每个层，具体可以参见pytorch帮助文档
     # 冻结resnet34特征提取层，特征提取层不参与参数更新
     for layer in model.children():
@@ -279,8 +283,7 @@ if __name__ == '__main__':
         vis = visdom.Visdom()
         viswin1 = vis.line(np.array([0.]),np.array([0.]),opts=dict(title="Loss/Step",xlabel="100*step",ylabel="Loss"))
     """
-    trainlog = open('train.log', mode = 'a',encoding='utf-8')
-    print(time.strftime('%Y-%m-%d %H:%m',time.localtime(time.time())),file=trainlog)
+    
     for e in range(epoch):
         model.train()
         

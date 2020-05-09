@@ -1,6 +1,77 @@
-2020-05-04 05:05
-2020-05-04 05:05
-2020-05-04 05:05
-2020-05-04 06:05
-2020-05-04 06:05
-2020-05-04 07:05
+2020-05-04 11:05
+epoch 0 : loss 5.4113
+epoch 1 : loss 4.2461
+epoch 2 : loss 4.4611
+epoch 3 : loss 1.4023
+epoch 4 : loss 4.2053
+epoch 5 : loss 1.2986
+epoch 6 : loss 2.4254
+epoch 7 : loss 2.3481
+epoch 8 : loss 1.4709
+epoch 9 : loss 0.9489
+2020-05-04 13:05
+epoch 10 : loss 2.1895
+2020-05-04 13:05
+epoch 0 : loss 3.0368
+epoch 1 : loss 2.4482
+epoch 2 : loss 1.7451
+epoch 3 : loss 3.8625
+epoch 4 : loss 3.3042
+epoch 5 : loss 3.5403
+epoch 6 : loss 1.5326
+epoch 7 : loss 2.3634
+epoch 8 : loss 1.6427
+epoch 9 : loss 2.2247
+2020-05-04 15:05
+epoch 10 : loss 2.7896
+epoch 11 : loss 3.0440
+epoch 12 : loss 2.7905
+epoch 13 : loss 1.5725
+epoch 14 : loss 2.5949
+epoch 15 : loss 2.2785
+epoch 16 : loss 1.9355
+epoch 17 : loss 3.6751
+epoch 18 : loss 1.7573
+epoch 19 : loss 2.0874
+2020-05-04 17:05
+epoch 20 : loss 1.3394
+epoch 21 : loss 2.6641
+epoch 22 : loss 1.9045
+epoch 23 : loss 2.6543
+epoch 24 : loss 1.2639
+epoch 25 : loss 1.8395
+epoch 26 : loss 1.5102
+epoch 27 : loss 1.2869
+epoch 28 : loss 1.7895
+epoch 29 : loss 1.4958
+2020-05-04 18:05
+epoch 30 : loss 1.7799
+epoch 31 : loss 1.6786
+epoch 32 : loss 1.5650
+epoch 33 : loss 1.4432
+epoch 34 : loss 1.1181
+epoch 35 : loss 1.8866
+epoch 36 : loss 1.4362
+epoch 37 : loss 4.1358
+epoch 38 : loss 2.4119
+epoch 39 : loss 0.7260
+2020-05-04 20:05
+epoch 40 : loss 2.0242
+epoch 41 : loss 1.4380
+epoch 42 : loss 1.4354
+epoch 43 : loss 0.9319
+epoch 44 : loss 1.9276
+epoch 45 : loss 1.8073
+epoch 46 : loss 2.2780
+epoch 47 : loss 1.2458
+epoch 48 : loss 1.5578
+epoch 49 : loss 1.7831
+2020-05-04 22:05
+2020-05-07 10:05
+BatchSize:  32  , lr : 0 
+2020-05-07 10:05
+BatchSize:  32  , lr : 0 
+2020-05-07 10:05
+BatchSize:  32  , lr : 0 
+2020-05-07 10:05
+BatchSize:  32  , lr : 0 
