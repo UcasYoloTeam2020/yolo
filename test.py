@@ -24,8 +24,6 @@ Pre_Train='Train_pre/'
 NUM_BBOX = 2
 BBOX_Pred_Path=(DATASET_PATH+'bboxs_preds/')#预测输出的bbox文件夹
 
-eval
-  
 # 注意检查一下输入数据的格式，到底是xywh还是xyxy
 def labels2bbox(matrix):
     """
@@ -149,7 +147,7 @@ if __name__ == '__main__':
     Train=False  #测试训练集
     val_dataloader = DataLoader(VOC2007(is_train=Train), batch_size=1, shuffle=False)
     model = torch.load("./models_pkl/YOLOv1_DataAug_epoch40.pkl")  # 加载训练好的模型
-    clr_bbox_path()
+    clr_bbox_path()#清除原来的bbox信息
     for i,(inputs,labels,filename) in enumerate(val_dataloader):
 
         inputs = inputs.cuda()
@@ -173,6 +171,6 @@ if __name__ == '__main__':
         img = img.astype(np.uint8)
         img_bbox=draw_bbox(img,bbox.cpu())  # 输出带有bbox的img图像
 
-        cv2.imwrite(PRED_PATH+''.join(filename)+'augmented_pre_40.jpg',img_bbox)
+        cv2.imwrite(PRED_PATH+''.join(filename)+'.jpg',img_bbox)
         print("测试图片 %s"%(filename))
 
