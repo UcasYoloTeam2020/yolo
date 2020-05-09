@@ -1,40 +1,17 @@
 #encoding:utf-8
-#
-#created by xiongzihua
-#
-import os
-os.environ["CUDA_VISIBLE_DEVICES"] = "1"
+
+
 import numpy as np
-VOC_CLASSES = (    # always index 0
-    'aeroplane', 'bicycle', 'bird', 'boat',
-    'bottle', 'bus', 'car', 'cat', 'chair',
-    'cow', 'diningtable', 'dog', 'horse',
-    'motorbike', 'person', 'pottedplant',
-    'sheep', 'sofa', 'train', 'tvmonitor')
-Color = [[0, 0, 0],
-                    [128, 0, 0],
-                    [0, 128, 0],
-                    [128, 128, 0],
-                    [0, 0, 128],
-                    [128, 0, 128],
-                    [0, 128, 128],
-                    [128, 128, 128],
-                    [64, 0, 0],
-                    [192, 0, 0],
-                    [64, 128, 0],
-                    [192, 128, 0],
-                    [64, 0, 128],
-                    [192, 0, 128],
-                    [64, 128, 128],
-                    [192, 128, 128],
-                    [0, 64, 0],
-                    [128, 64, 0],
-                    [0, 192, 0],
-                    [128, 192, 0],
-                    [0, 64, 128]]
-def voc_ap(rec,prec,use_07_metric=False):
+from test import BBOX_Pred_Path,DATASET_PATH,CLASSES
+from train import calculate_iou
+from collections import defaultdict
+import os
+
+labels_Path=DATASET_PATH + "labels_augmentation/"
+
+def caculate_ap(rec,prec,use_07_metric=False):
     if use_07_metric:
-        # 11 point metric
+    # 11 point metric
         ap = 0.
         for t in np.arange(0.,1.1,0.1):
             if np.sum(rec >= t) == 0:
@@ -56,8 +33,7 @@ def voc_ap(rec,prec,use_07_metric=False):
         ap = np.sum((mrec[i + 1] - mrec[i]) * mpre[i + 1])
 
     return ap
-
-def voc_eval(preds,target,VOC_CLASSES=VOC_CLASSES,threshold=0.5,use_07_metric=False,):
+def get_map(preds,target,VOC_CLASSES=CLASSES,threshold=0.5,use_07_metric=True,):
     '''
     preds {'cat':[[image_id,confidence,x1,y1,x2,y2],...],'dog':[[],...]}
     target {(image_id,class):[[],]}
@@ -95,19 +71,7 @@ def voc_eval(preds,target,VOC_CLASSES=VOC_CLASSES,threshold=0.5,use_07_metric=Fa
                 for bbgt in BBGT:
                     # compute overlaps
                     # intersection
-                    ixmin = np.maximum(bbgt[0], bb[0])
-                    iymin = np.maximum(bbgt[1], bb[1])
-                    ixmax = np.minimum(bbgt[2], bb[2])
-                    iymax = np.minimum(bbgt[3], bb[3])
-                    iw = np.maximum(ixmax - ixmin + 1., 0.)
-                    ih = np.maximum(iymax - iymin + 1., 0.)
-                    inters = iw * ih
-
-                    union = (bb[2]-bb[0]+1.)*(bb[3]-bb[1]+1.) + (bbgt[2]-bbgt[0]+1.)*(bbgt[3]-bbgt[1]+1.) - inters
-                    if union == 0:
-                        print(bb,bbgt)
-                    
-                    overlaps = inters/union
+                    overlaps = calculate_iou(bbgt,bb)
                     if overlaps > threshold:
                         tp[d] = 1
                         BBGT.remove(bbgt) #这个框已经匹配到了，不能再匹配
@@ -122,85 +86,46 @@ def voc_eval(preds,target,VOC_CLASSES=VOC_CLASSES,threshold=0.5,use_07_metric=Fa
         rec = tp/float(npos)
         prec = tp/np.maximum(tp + fp, np.finfo(np.float64).eps)
         #print(rec,prec)
-        ap = voc_ap(rec, prec, use_07_metric)
+        ap = caculate_ap(rec, prec, use_07_metric)
         print('---class {} ap {}---'.format(class_,ap))
         aps += [ap]
     print('---map {}---'.format(np.mean(aps)))
 
-def test_eval():
-    preds = {'cat':[['image01',0.9,20,20,40,40],['image01',0.8,20,20,50,50],['image02',0.8,30,30,50,50]],'dog':[['image01',0.78,60,60,90,90]]}
-    target = {('image01','cat'):[[20,20,41,41]],('image01','dog'):[[60,60,91,91]],('image02','cat'):[[30,30,51,51]]}
-    voc_eval(preds,target,VOC_CLASSES=['cat','dog'])
+def get_preds(filelist):
+    preds=defaultdict(list)
+    for i,file in enumerate(filelist):
+        with open(BBOX_Pred_Path+file,'r') as f:
+                bboxs=f.readlines()
+                for bbox in bboxs: 
+                    bbox=[float(x.strip()) for x in bbox.split()]
+                    #按类添加bbox信息[imgid,confi,x1,x2,y1,y2]
+                    preds[CLASSES[int(bbox[0])]].append([file[:-4]]+[bbox[5]]+bbox[1:5])#按bbox信息添加imgid
+    return preds
 
-if __name__ == '__main__':
-    #test_eval()
-    from predict import *
-    from collections import defaultdict
-    from tqdm import tqdm
+def deconvert_bbox(bbox):
+    #把’cls,xc,yc,w,h'转为‘cls,x,y,x,y'
+    [CLS,xc,yc,w,h]=[x for x in bbox]
+    xmin=xc-w/2
+    xmax=xc+w/2
+    ymin=yc-h/2
+    ymax=yc+h/2
 
-    target =  defaultdict(list)
-    preds = defaultdict(list)
-    image_list = [] #image path list
+    return [CLS,xmin,ymin,xmax,ymax]
 
-    f = open('voc2007test.txt')
-    lines = f.readlines()
-    file_list = []
-    for line in lines:
-        splited = line.strip().split()
-        file_list.append(splited)
-    f.close()
-    print('---prepare target---')
-    for index,image_file in enumerate(file_list):
-        image_id = image_file[0]
+def get_targets(filelist):
+    targets=defaultdict(list)
+    for i,file in enumerate(filelist):
+        with open(labels_Path+file,'r') as f:
+            bboxs=f.readlines()
+            for bbox in bboxs:
+                bbox=[float(x.strip()) for x in bbox.split()]
+                bbox=deconvert_bbox(bbox)
+                imgid=file[:-4]
+                targets[imgid,CLASSES[int(bbox[0])]].append(bbox[1:])
+    return targets
+if __name__ == '__main__':   
+    filelist=os.listdir(BBOX_Pred_Path)
+    preds=get_preds(filelist)
+    targets=get_targets(filelist)
+    get_map(preds,targets)
 
-        image_list.append(image_id)
-        num_obj = (len(image_file) - 1) // 5
-        for i in range(num_obj):
-            x1 = int(image_file[1+5*i])
-            y1 = int(image_file[2+5*i])
-            x2 = int(image_file[3+5*i])
-            y2 = int(image_file[4+5*i])
-            c = int(image_file[5+5*i])
-            class_name = VOC_CLASSES[c]
-            target[(image_id,class_name)].append([x1,y1,x2,y2])
-    #
-    #start test
-    #
-    print('---start test---')
-    # model = vgg16_bn(pretrained=False)
-    model = resnet50()
-    # model.classifier = nn.Sequential(
-    #             nn.Linear(512 * 7 * 7, 4096),
-    #             nn.ReLU(True),
-    #             nn.Dropout(),
-    #             #nn.Linear(4096, 4096),
-    #             #nn.ReLU(True),
-    #             #nn.Dropout(),
-    #             nn.Linear(4096, 1470),
-    #         )
-    model.load_state_dict(torch.load('best.pth'))
-    model.eval()
-    model.cuda()
-    count = 0
-    for image_path in tqdm(image_list):
-        result = predict_gpu(model,image_path,root_path='/home/xzh/data/VOCdevkit/VOC2012/allimgs/') #result[[left_up,right_bottom,class_name,image_path],]
-        for (x1,y1),(x2,y2),class_name,image_id,prob in result: #image_id is actually image_path
-            preds[class_name].append([image_id,prob,x1,y1,x2,y2])
-        # print(image_path)
-        # image = cv2.imread('/home/xzh/data/VOCdevkit/VOC2012/allimgs/'+image_path)
-        # for left_up,right_bottom,class_name,_,prob in result:
-        #     color = Color[VOC_CLASSES.index(class_name)]
-        #     cv2.rectangle(image,left_up,right_bottom,color,2)
-        #     label = class_name+str(round(prob,2))
-        #     text_size, baseline = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, 0.4, 1)
-        #     p1 = (left_up[0], left_up[1]- text_size[1])
-        #     cv2.rectangle(image, (p1[0] - 2//2, p1[1] - 2 - baseline), (p1[0] + text_size[0], p1[1] + text_size[1]), color, -1)
-        #     cv2.putText(image, label, (p1[0], p1[1] + baseline), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255,255,255), 1, 8)
-
-        # cv2.imwrite('testimg/'+image_path,image)
-        # count += 1
-        # if count == 100:
-        #     break
-    
-    print('---start evaluate---')
-    voc_eval(preds,target,VOC_CLASSES=VOC_CLASSES)

@@ -10,6 +10,7 @@ import torchvision.models as tvmodel
 from torch.utils.data import Dataset, DataLoader, TensorDataset
 # 从train.py 调用
 from train import VOC2007,YOLOv1_resnet,calculate_iou
+import shutil
 import pdb #DeBUG TOOL
 #为了加快计算，只用了7类，
 CLASSES = ['person', 'bird', 'cat', 'cow', 'dog', 'horse', 'sheep']
@@ -21,9 +22,10 @@ DATASET_PATH = 'VOCdevkit/VOC2007/'
 PRED_PATH='Pred_img/'
 Pre_Train='Train_pre/'
 NUM_BBOX = 2
-#
+BBOX_Pred_Path=(DATASET_PATH+'bboxs_preds/')#预测输出的bbox文件夹
 
-    
+eval
+  
 # 注意检查一下输入数据的格式，到底是xywh还是xyxy
 def labels2bbox(matrix):
     """
@@ -51,6 +53,7 @@ def labels2bbox(matrix):
                                                 (matrix[i, j, 6] + i) / 7 + matrix[i, j, 8] / 2])
             bbox[2 * (i * 7 + j)+1, 4] = matrix[i, j, 9]
             bbox[2*(i*7+j)+1,5:] = matrix[i,j,10:]
+    # pdb.set_trace()
     return NMS(bbox)  # 对所有98个bbox执行NMS算法，清理cls-specific confidence score较低以及iou重合度过高的bbox
 
 
@@ -62,7 +65,6 @@ def NMS(bbox, conf_thresh=0.1, iou_thresh=0.3):
     n = bbox.size()[0]
     bbox_prob = bbox[:,5:].clone()  # 类别预测的条件概率
     bbox_confi = bbox[:, 4].clone().unsqueeze(1).expand_as(bbox_prob)  # 预测置信度
-    # pdb.set_trace?()
     bbox_cls_spec_conf = bbox_confi*bbox_prob  # 置信度*类别条件概率=cls-specific confidence score整合了是否有物体及是什么物体的两种信息
     bbox_cls_spec_conf[bbox_cls_spec_conf<=conf_thresh] = 0  # 将低于阈值的bbox忽略
     for c in range(len(CLASSES)):
@@ -106,8 +108,6 @@ def draw_bbox(img,bbox):
     n = bbox.size()[0]
     if n==0:
         return img
-    # pdb.set_trace()
-    # print(bbox)
     for i in range(n):
         if bbox[i,1] > 1:
             bbox[i,1] = 1
@@ -130,14 +130,29 @@ def draw_bbox(img,bbox):
     # cv2.waitKey(0)
     return img
 
+def save_imgbbox(bboxs,filename):
+    """
+    保存预测信息
+    bboxs:[cls,x1,y1,x2,y2,confi]*n
+    """
+    for i in range(len(bboxs)):
+        with open(BBOX_Pred_Path+"%s.txt" % (''.join(filename)),'a+') as out_file:
+            out_file.write(' '.join([str(a) for a in bboxs[i].tolist()])+'\n')
+
+
+def clr_bbox_path():
+  if os.path.exists(BBOX_Pred_Path):
+        shutil.rmtree(BBOX_Pred_Path)
+  os.mkdir(BBOX_Pred_Path)
+
 if __name__ == '__main__':
-    Train=True  #测试训练集
+    Train=False  #测试训练集
     val_dataloader = DataLoader(VOC2007(is_train=Train), batch_size=1, shuffle=False)
-    model = torch.load("./models_pkl/YOLOv1_epoch50.pkl")  # 加载训练好的模型
+    model = torch.load("./models_pkl/YOLOv1_DataAug_epoch40.pkl")  # 加载训练好的模型
+    clr_bbox_path()
     for i,(inputs,labels,filename) in enumerate(val_dataloader):
-        # print(filename)
+
         inputs = inputs.cuda()
-        # pdb.set_trace()
         # 以下代码是测试labels2bbox函数的时候再用
         # labels = labels.float().cuda()
         # labels = labels.squeeze(dim=0)
@@ -149,18 +164,15 @@ if __name__ == '__main__':
 
         # ## 测试labels2bbox时，使用 labels作为labels2bbox2函数的输入
         bbox = labels2bbox(pred)  # 此处可以用labels代替pred，测试一下输出的bbox是否和标签一样，从而检查labels2bbox函数是否正确。当然，还要注意将数据集改成训练集而不是测试集，因为测试集没有labels。
-        # import pdb;pdb.set_trace()
+        save_imgbbox(bbox,filename)
+        
         inputs = inputs.squeeze(dim=0)  # 输入图像的尺寸是(1,3,448,448),压缩为(3,448,448)
         inputs = inputs.permute((1,2,0))  # 转换为(448,448,3)
         img = inputs.cpu().numpy()
         img = 255*img  # 将图像的数值从(0,1)映射到(0,255)并转为非负整形
         img = img.astype(np.uint8)
-        img_bbox=draw_bbox(img,bbox.cpu()) 
-        # pdb.set_trace() # 输出带有bbox的img图像
+        img_bbox=draw_bbox(img,bbox.cpu())  # 输出带有bbox的img图像
 
-        cv2.imwrite(Pre_Train+(str(filename)[2:-3]+'pre_50.jpg').rjust(13,'0'),img_bbox)
+        cv2.imwrite(PRED_PATH+''.join(filename)+'augmented_pre_40.jpg',img_bbox)
         print("测试图片 %s"%(filename))
-        if i>50: #测试50p训练图片
-            break
-        # print(bbox.size(),bbox)
-        # input()
+
