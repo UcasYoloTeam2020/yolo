@@ -161,22 +161,22 @@ class Loss_yolov1(nn.Module):
         coor_loss = 0.  # 含有目标的bbox的坐标损失
         obj_confi_loss = 0.  # 含有目标的bbox的置信度损失
         class_loss = 0.  # 含有目标的网格的类别损失
-        n = labels.size()[0]  # batchsize的大小
+        n_batch = labels.size()[0]  # batchsize的大小
 
         # 可以考虑用矩阵运算进行优化，提高速度，为了准确起见，这里还是用循环
-        for i in range(n):  # batchsize循环
+        for i in range(n_batch):  # batchsize循环
             for m in range(7):  # x方向网格循环
                 for n in range(7):  # y方向网格循环
                     if labels[i,4,m,n]==1:# 如果包含物体
                         # 将数据(px,py,w,h)转换为(x1,y1,x2,y2)
                         # 先将px,py转换为cx,cy，即相对网格的位置转换为标准化后实际的bbox中心位置cx,xy
                         # 然后再利用(cx-w/2,cy-h/2,cx+w/2,cy+h/2)转换为xyxy形式，用于计算iou
-                        bbox1_pred_xyxy = ((pred[i,0,m,n]+m)/num_gridx - pred[i,2,m,n]/2,(pred[i,1,m,n]+n)/num_gridy - pred[i,3,m,n]/2,
-                                           (pred[i,0,m,n]+m)/num_gridx + pred[i,2,m,n]/2,(pred[i,1,m,n]+n)/num_gridy + pred[i,3,m,n]/2)
-                        bbox2_pred_xyxy = ((pred[i,5,m,n]+m)/num_gridx - pred[i,7,m,n]/2,(pred[i,6,m,n]+n)/num_gridy - pred[i,8,m,n]/2,
-                                           (pred[i,5,m,n]+m)/num_gridx + pred[i,7,m,n]/2,(pred[i,6,m,n]+n)/num_gridy + pred[i,8,m,n]/2)
-                        bbox_gt_xyxy = ((labels[i,0,m,n]+m)/num_gridx - labels[i,2,m,n]/2,(labels[i,1,m,n]+n)/num_gridy - labels[i,3,m,n]/2,
-                                        (labels[i,0,m,n]+m)/num_gridx + labels[i,2,m,n]/2,(labels[i,1,m,n]+n)/num_gridy + labels[i,3,m,n]/2)
+                        bbox1_pred_xyxy = ((pred[i,0,m,n]+n)/num_gridx - pred[i,2,m,n]/2,(pred[i,1,m,n]+m)/num_gridy - pred[i,3,m,n]/2,
+                                           (pred[i,0,m,n]+n)/num_gridx + pred[i,2,m,n]/2,(pred[i,1,m,n]+m)/num_gridy + pred[i,3,m,n]/2)
+                        bbox2_pred_xyxy = ((pred[i,5,m,n]+n)/num_gridx - pred[i,7,m,n]/2,(pred[i,6,m,n]+m)/num_gridy - pred[i,8,m,n]/2,
+                                           (pred[i,5,m,n]+n)/num_gridx + pred[i,7,m,n]/2,(pred[i,6,m,n]+m)/num_gridy + pred[i,8,m,n]/2)
+                        bbox_gt_xyxy = ((labels[i,0,m,n]+n)/num_gridx - labels[i,2,m,n]/2,(labels[i,1,m,n]+m)/num_gridy - labels[i,3,m,n]/2,
+                                        (labels[i,0,m,n]+n)/num_gridx + labels[i,2,m,n]/2,(labels[i,1,m,n]+m)/num_gridy + labels[i,3,m,n]/2)
                         iou1 = calculate_iou(bbox1_pred_xyxy,bbox_gt_xyxy)
                         iou2 = calculate_iou(bbox2_pred_xyxy,bbox_gt_xyxy)
                         # 选择iou大的bbox作为负责物体
