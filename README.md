@@ -43,4 +43,8 @@
 
 ## Resnet_dilat文件说明from赵千帆
  可以直接调用文件中的resnet_dilat函数代替model.resnet32赋值给resnet。
+ 
+## 调用VGG预训练模型训练
+ 1.从https://github.com/jcjohnson/pytorch-vgg下载vgg16的pytorch预训练模型
+ 2.直接运行train_vgg.py test_vgg.py即可
 
