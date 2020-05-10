@@ -57,14 +57,14 @@ class VOC2007(Dataset):
         """
         self.filenames = []  # 储存数据集的文件名称
         if is_train:
-            with open(DATASET_PATH + "ImageSets/Main/train_augmentation.txt", 'r') as f: # 调用包含训练集图像名称的txt文件
+            with open(DATASET_PATH + "ImageSets/Main/train.txt", 'r') as f: # 调用包含训练集图像名称的txt文件
                 self.filenames = [x.strip() for x in f]
         else:
             with open(DATASET_PATH + "ImageSets/Main/val.txt", 'r') as f:
                 self.filenames = [x.strip() for x in f]
                 # print(filenames)
         self.imgpath = DATASET_PATH + "JPEGImages_augmentation/"  # 原始图像所在的路径
-        self.labelpath = DATASET_PATH + "labels/"  # 图像对应的label文件(.txt文件)的路径
+        self.labelpath = DATASET_PATH + "labels_augmentation/"  # 图像对应的label文件(.txt文件)的路径
         self.is_aug = is_aug
 
 
@@ -165,18 +165,18 @@ class Loss_yolov1(nn.Module):
 
         # 可以考虑用矩阵运算进行优化，提高速度，为了准确起见，这里还是用循环
         for i in range(n_batch):  # batchsize循环
-            for m in range(7):  # x方向网格循环
-                for n in range(7):  # y方向网格循环
+            for n in range(7):  # x方向网格循环
+                for m in range(7):  # y方向网格循环
                     if labels[i,4,m,n]==1:# 如果包含物体
                         # 将数据(px,py,w,h)转换为(x1,y1,x2,y2)
                         # 先将px,py转换为cx,cy，即相对网格的位置转换为标准化后实际的bbox中心位置cx,xy
                         # 然后再利用(cx-w/2,cy-h/2,cx+w/2,cy+h/2)转换为xyxy形式，用于计算iou
-                        bbox1_pred_xyxy = ((pred[i,0,m,n]+n)/num_gridx - pred[i,2,m,n]/2,(pred[i,1,m,n]+m)/num_gridy - pred[i,3,m,n]/2,
-                                           (pred[i,0,m,n]+n)/num_gridx + pred[i,2,m,n]/2,(pred[i,1,m,n]+m)/num_gridy + pred[i,3,m,n]/2)
-                        bbox2_pred_xyxy = ((pred[i,5,m,n]+n)/num_gridx - pred[i,7,m,n]/2,(pred[i,6,m,n]+m)/num_gridy - pred[i,8,m,n]/2,
-                                           (pred[i,5,m,n]+n)/num_gridx + pred[i,7,m,n]/2,(pred[i,6,m,n]+m)/num_gridy + pred[i,8,m,n]/2)
-                        bbox_gt_xyxy = ((labels[i,0,m,n]+n)/num_gridx - labels[i,2,m,n]/2,(labels[i,1,m,n]+m)/num_gridy - labels[i,3,m,n]/2,
-                                        (labels[i,0,m,n]+n)/num_gridx + labels[i,2,m,n]/2,(labels[i,1,m,n]+m)/num_gridy + labels[i,3,m,n]/2)
+                        bbox1_pred_xyxy = ((pred[i,0,m,n]+m)/num_gridx - pred[i,2,m,n]/2,(pred[i,1,m,n]+n)/num_gridy - pred[i,3,m,n]/2,
+                                           (pred[i,0,m,n]+m)/num_gridx + pred[i,2,m,n]/2,(pred[i,1,m,n]+n)/num_gridy + pred[i,3,m,n]/2)
+                        bbox2_pred_xyxy = ((pred[i,5,m,n]+m)/num_gridx - pred[i,7,m,n]/2,(pred[i,6,m,n]+n)/num_gridy - pred[i,8,m,n]/2,
+                                           (pred[i,5,m,n]+m)/num_gridx + pred[i,7,m,n]/2,(pred[i,6,m,n]+n)/num_gridy + pred[i,8,m,n]/2)
+                        bbox_gt_xyxy = ((labels[i,0,m,n]+m)/num_gridx - labels[i,2,m,n]/2,(labels[i,1,m,n]+n)/num_gridy - labels[i,3,m,n]/2,
+                                        (labels[i,0,m,n]+m)/num_gridx + labels[i,2,m,n]/2,(labels[i,1,m,n]+n)/num_gridy + labels[i,3,m,n]/2)
                         iou1 = calculate_iou(bbox1_pred_xyxy,bbox_gt_xyxy)
                         iou2 = calculate_iou(bbox2_pred_xyxy,bbox_gt_xyxy)
                         # 选择iou大的bbox作为负责物体
@@ -198,7 +198,7 @@ class Loss_yolov1(nn.Module):
 
         loss = coor_loss + obj_confi_loss + noobj_confi_loss + class_loss
         # 此处可以写代码验证一下loss的大致计算是否正确，这个要验证起来比较麻烦，比较简洁的办法是，将输入的pred置为全1矩阵，再进行误差检查，会直观很多。
-        return loss/n
+        return loss/n_batch
 
 
 class YOLOv1_resnet(nn.Module):
@@ -252,12 +252,12 @@ class YOLOv1_resnet(nn.Module):
 
 if __name__ == '__main__':
 	 #设置使用的gpu
-    os.environ['CUDA_VISIBLE_DEVICES']='0'   
+    os.environ['CUDA_VISIBLE_DEVICES']='1'   
     trainlog = open('train.log', mode = 'a',encoding='utf-8')
     print(time.strftime('%Y-%m-%d %H:%m',time.localtime(time.time())),file=trainlog)
 
     epoch = 50
-    batchsize = 32
+    batchsize = 16
     lr = 0.000005
     print("BatchSize:  %d  , lr : %d "%(batchsize,lr),file=trainlog)
     train_data = VOC2007()
@@ -268,7 +268,7 @@ if __name__ == '__main__':
     
     #用gpu训练
     model = YOLOv1_resnet().cuda()
-    model = torch.load("./models_pkl/YOLOv1_DataAug_epoch10.pkl")
+    # model = torch.load("./models_pkl/YOLOv1_DataAug_epoch10.pkl")
     # model.children()里是按模块(Sequential)提取的子模块，而不是具体到每个层，具体可以参见pytorch帮助文档
     # 冻结resnet34特征提取层，特征提取层不参与参数更新
     for layer in model.children():
@@ -318,7 +318,7 @@ if __name__ == '__main__':
             """
         print("epoch %d : loss %.4f"%(e,loss),file=trainlog)    
         if (e+1)%10==0:
-                torch.save(model,"./models_pkl/YOLOv1_DataAug_epoch"+str(e+1)+".pkl")
+                torch.save(model,"./models_pkl/YOLOv1_update_epoch"+str(e+1)+".pkl")
                 print(time.strftime('%Y-%m-%d %H:%m',time.localtime(time.time())),file=trainlog)
                 # compute_val_map(model)
 

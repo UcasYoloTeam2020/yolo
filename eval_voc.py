@@ -2,13 +2,13 @@
 
 
 import numpy as np
-from test import BBOX_Pred_Path,DATASET_PATH,CLASSES
+from test import BBOX_Pred_Path,DATASET_PATH,CLASSES,model_name
 from train import calculate_iou
 from collections import defaultdict
 import os
 
 labels_Path=DATASET_PATH + "labels_augmentation/"
-
+evoc_file='evoc.log'
 def caculate_ap(rec,prec,use_07_metric=False):
     if use_07_metric:
     # 11 point metric
@@ -33,7 +33,7 @@ def caculate_ap(rec,prec,use_07_metric=False):
         ap = np.sum((mrec[i + 1] - mrec[i]) * mpre[i + 1])
 
     return ap
-def get_map(preds,target,VOC_CLASSES=CLASSES,threshold=0.5,use_07_metric=True,):
+def get_map(preds,target,VOC_CLASSES=CLASSES,threshold=0.5,use_07_metric=False,):
     '''
     preds {'cat':[[image_id,confidence,x1,y1,x2,y2],...],'dog':[[],...]}
     target {(image_id,class):[[],]}
@@ -88,7 +88,9 @@ def get_map(preds,target,VOC_CLASSES=CLASSES,threshold=0.5,use_07_metric=True,):
         #print(rec,prec)
         ap = caculate_ap(rec, prec, use_07_metric)
         print('---class {} ap {}---'.format(class_,ap))
+        print('---class {} ap {}---'.format(class_,ap),file=evoc_log)
         aps += [ap]
+    print('---map {}---'.format(np.mean(aps)),file=evoc_log)
     print('---map {}---'.format(np.mean(aps)))
 
 def get_preds(filelist):
@@ -124,7 +126,10 @@ def get_targets(filelist):
                 targets[imgid,CLASSES[int(bbox[0])]].append(bbox[1:])
     return targets
 if __name__ == '__main__':   
+    evoc_log=open(evoc_file,'a+')
+    evoc_log.write('*'*15+model_name+'*'*15+'\n')
     filelist=os.listdir(BBOX_Pred_Path)
+    # print(len(filelist))
     preds=get_preds(filelist)
     targets=get_targets(filelist)
     get_map(preds,targets)

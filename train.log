@@ -1,189 +1,144 @@
-train with resnet(augment data and wrong code):
-Epoch 0/50| Step 0/398| Loss: 103.97
-Epoch 0/50| Step 1/398| Loss: 108.75
-Epoch 0/50| Step 2/398| Loss: 79.25
-Epoch 0/50| Step 3/398| Loss: 80.97
-Epoch 0/50| Step 4/398| Loss: 72.63
-Epoch 0/50| Step 5/398| Loss: 65.62
-Epoch 0/50| Step 6/398| Loss: 64.93
-Epoch 0/50| Step 7/398| Loss: 39.66
-Epoch 0/50| Step 8/398| Loss: 38.58
-Epoch 0/50| Step 9/398| Loss: 30.79
-Epoch 0/50| Step 10/398| Loss: 33.61
-Epoch 0/50| Step 11/398| Loss: 36.34
-Epoch 0/50| Step 12/398| Loss: 36.38
-Epoch 0/50| Step 13/398| Loss: 31.07
-Epoch 0/50| Step 14/398| Loss: 23.53
-Epoch 0/50| Step 15/398| Loss: 16.69
-Epoch 0/50| Step 16/398| Loss: 20.14
-Epoch 0/50| Step 17/398| Loss: 21.47
-Epoch 0/50| Step 18/398| Loss: 22.29
-Epoch 0/50| Step 19/398| Loss: 25.09
-Epoch 0/50| Step 20/398| Loss: 19.58
-Epoch 0/50| Step 21/398| Loss: 21.68
-Epoch 0/50| Step 22/398| Loss: 38.48
-Epoch 0/50| Step 23/398| Loss: 16.70
-Epoch 0/50| Step 24/398| Loss: 32.05
-Epoch 0/50| Step 25/398| Loss: 20.29
-Epoch 0/50| Step 26/398| Loss: 21.99
-Epoch 0/50| Step 27/398| Loss: 18.31
-Epoch 0/50| Step 28/398| Loss: 19.92
-Epoch 0/50| Step 29/398| Loss: 19.42
-Epoch 0/50| Step 30/398| Loss: 16.94
-Epoch 0/50| Step 31/398| Loss: 21.23
-Epoch 0/50| Step 32/398| Loss: 14.93
-Epoch 0/50| Step 33/398| Loss: 24.65
-Epoch 0/50| Step 34/398| Loss: 17.42
-Epoch 0/50| Step 35/398| Loss: 20.14
-Epoch 0/50| Step 36/398| Loss: 17.30
-Epoch 0/50| Step 37/398| Loss: 17.55
-Epoch 0/50| Step 38/398| Loss: 18.39
-Epoch 0/50| Step 39/398| Loss: 23.14
-Epoch 0/50| Step 40/398| Loss: 22.49
-Epoch 0/50| Step 41/398| Loss: 17.64
-Epoch 0/50| Step 42/398| Loss: 20.94
-Epoch 0/50| Step 43/398| Loss: 15.01
-Epoch 0/50| Step 44/398| Loss: 15.11
-Epoch 0/50| Step 45/398| Loss: 15.69
-Epoch 0/50| Step 46/398| Loss: 15.42
-Epoch 0/50| Step 47/398| Loss: 20.44
-Epoch 0/50| Step 48/398| Loss: 19.60
-Epoch 0/50| Step 49/398| Loss: 15.57
-Epoch 0/50| Step 50/398| Loss: 18.87
-Epoch 0/50| Step 51/398| Loss: 23.04
-Epoch 0/50| Step 52/398| Loss: 18.36
-Epoch 0/50| Step 53/398| Loss: 18.10
-Epoch 0/50| Step 54/398| Loss: 23.65
-Epoch 0/50| Step 55/398| Loss: 21.68
-Epoch 0/50| Step 56/398| Loss: 24.31
-Epoch 0/50| Step 57/398| Loss: 18.90
-Epoch 0/50| Step 58/398| Loss: 18.67
-Epoch 0/50| Step 59/398| Loss: 18.99
-Epoch 0/50| Step 60/398| Loss: 18.86
-Epoch 0/50| Step 61/398| Loss: 17.10
-Epoch 0/50| Step 62/398| Loss: 19.66
-Epoch 0/50| Step 63/398| Loss: 17.37
-Epoch 0/50| Step 64/398| Loss: 21.04
-Epoch 0/50| Step 65/398| Loss: 16.31
-Epoch 0/50| Step 66/398| Loss: 15.80
-Epoch 0/50| Step 67/398| Loss: 18.03
-Epoch 0/50| Step 68/398| Loss: 18.10
-Epoch 0/50| Step 69/398| Loss: 19.09
-Epoch 0/50| Step 70/398| Loss: 16.69
-Epoch 0/50| Step 71/398| Loss: 18.33
-Epoch 0/50| Step 72/398| Loss: 25.81
-Epoch 0/50| Step 73/398| Loss: 14.50
-Epoch 0/50| Step 74/398| Loss: 25.89
-Epoch 0/50| Step 75/398| Loss: 17.39
-Epoch 0/50| Step 76/398| Loss: 20.25
-Epoch 0/50| Step 77/398| Loss: 23.62
----class person ap 0.1167650531286895---
----class bird ap -1---
----class cat ap -1---
----class cow ap -1---
----class dog ap 0.0---
----class horse ap 0.09090909090909091---
----class sheep ap -1---
----map -0.5417608365660314---
-
-train with vgg16(augment data and wrong code):
-Epoch 0/50| Step 0/797| Loss: 47.87
-Epoch 0/50| Step 1/797| Loss: 45.82
-Epoch 0/50| Step 2/797| Loss: 44.04
-Epoch 0/50| Step 3/797| Loss: 46.52
-Epoch 0/50| Step 4/797| Loss: 36.77
-Epoch 0/50| Step 5/797| Loss: 33.40
-Epoch 0/50| Step 6/797| Loss: 36.86
-Epoch 0/50| Step 7/797| Loss: 30.68
-Epoch 0/50| Step 8/797| Loss: 28.73
-Epoch 0/50| Step 9/797| Loss: 25.06
-Epoch 0/50| Step 10/797| Loss: 19.30
-Epoch 0/50| Step 11/797| Loss: 21.65
-Epoch 0/50| Step 12/797| Loss: 21.27
-Epoch 0/50| Step 13/797| Loss: 30.88
-Epoch 0/50| Step 14/797| Loss: 30.70
-Epoch 0/50| Step 15/797| Loss: 9.77
-Epoch 0/50| Step 16/797| Loss: 13.25
-Epoch 0/50| Step 17/797| Loss: 18.51
-Epoch 0/50| Step 18/797| Loss: 8.78
-Epoch 0/50| Step 19/797| Loss: 10.09
-Epoch 0/50| Step 20/797| Loss: 10.84
-Epoch 0/50| Step 21/797| Loss: 11.73
-Epoch 0/50| Step 22/797| Loss: 11.60
-Epoch 0/50| Step 23/797| Loss: 12.70
-Epoch 0/50| Step 24/797| Loss: 9.68
-Epoch 0/50| Step 25/797| Loss: 12.54
-Epoch 0/50| Step 26/797| Loss: 11.67
-Epoch 0/50| Step 27/797| Loss: 16.20
-Epoch 0/50| Step 28/797| Loss: 13.70
-Epoch 0/50| Step 29/797| Loss: 13.34
-Epoch 0/50| Step 30/797| Loss: 11.25
-Epoch 0/50| Step 31/797| Loss: 9.60
-Epoch 0/50| Step 32/797| Loss: 7.70
-Epoch 0/50| Step 33/797| Loss: 14.57
-Epoch 0/50| Step 34/797| Loss: 10.01
-Epoch 0/50| Step 35/797| Loss: 7.52
-Epoch 0/50| Step 36/797| Loss: 13.46
-Epoch 0/50| Step 37/797| Loss: 11.21
-Epoch 0/50| Step 38/797| Loss: 11.22
-Epoch 0/50| Step 39/797| Loss: 11.53
-Epoch 0/50| Step 40/797| Loss: 10.44
-Epoch 0/50| Step 41/797| Loss: 6.25
-Epoch 0/50| Step 42/797| Loss: 7.57
-Epoch 0/50| Step 43/797| Loss: 10.34
-Epoch 0/50| Step 44/797| Loss: 9.76
-Epoch 0/50| Step 45/797| Loss: 11.78
-Epoch 0/50| Step 46/797| Loss: 14.99
-Epoch 0/50| Step 47/797| Loss: 7.77
-Epoch 0/50| Step 48/797| Loss: 7.90
-Epoch 0/50| Step 49/797| Loss: 7.42
-Epoch 0/50| Step 50/797| Loss: 10.88
-Epoch 0/50| Step 51/797| Loss: 7.99
-Epoch 0/50| Step 52/797| Loss: 10.68
-Epoch 0/50| Step 53/797| Loss: 10.55
-Epoch 0/50| Step 54/797| Loss: 10.36
-Epoch 0/50| Step 55/797| Loss: 12.11
-Epoch 0/50| Step 56/797| Loss: 10.57
-Epoch 0/50| Step 57/797| Loss: 10.73
-Epoch 0/50| Step 58/797| Loss: 10.03
-Epoch 0/50| Step 59/797| Loss: 8.56
-Epoch 0/50| Step 60/797| Loss: 8.77
-Epoch 0/50| Step 61/797| Loss: 15.28
-Epoch 0/50| Step 62/797| Loss: 10.17
-Epoch 0/50| Step 63/797| Loss: 9.90
-Epoch 0/50| Step 64/797| Loss: 13.05
-Epoch 0/50| Step 65/797| Loss: 12.68
-Epoch 0/50| Step 66/797| Loss: 11.48
-Epoch 0/50| Step 67/797| Loss: 8.73
-Epoch 0/50| Step 68/797| Loss: 12.76
-Epoch 0/50| Step 69/797| Loss: 8.70
-Epoch 0/50| Step 70/797| Loss: 8.45
-Epoch 0/50| Step 71/797| Loss: 11.39
-Epoch 0/50| Step 72/797| Loss: 11.32
-Epoch 0/50| Step 73/797| Loss: 10.18
-Epoch 0/50| Step 74/797| Loss: 8.47
-Epoch 0/50| Step 75/797| Loss: 8.90
-Epoch 0/50| Step 76/797| Loss: 8.78
-Epoch 0/50| Step 77/797| Loss: 5.84
-Epoch 0/50| Step 78/797| Loss: 10.08
-Epoch 0/50| Step 79/797| Loss: 9.26
-Epoch 0/50| Step 80/797| Loss: 9.15
-Epoch 1/50| Step 0/797| Loss: 5.20
-Epoch 2/50| Step 0/797| Loss: 3.44
-Epoch 3/50| Step 0/797| Loss: 2.37
-Epoch 5/50| Step 0/797| Loss: 0.66
-Epoch 6/50| Step 0/797| Loss: 1.51
-Epoch 7/50| Step 0/797| Loss: 0.87
-Epoch 8/50| Step 0/797| Loss: 1.35
-Epoch 9/50| Step 0/797| Loss: 0.93
-Epoch 10/50| Step 0/797| Loss: 1.10
----class person ap 0.07904105249116254---
----class bird ap 0.1616161616161616---
----class cat ap 0.20376175548589343---
----class cow ap 0.0---
----class dog ap 0.09090909090909091---
----class horse ap 0.15047021943573669---
----class sheep ap -1---
----map -0.04488596000885069---
-
-
+2020-05-04 11:05
+epoch 0 : loss 5.4113
+epoch 1 : loss 4.2461
+epoch 2 : loss 4.4611
+epoch 3 : loss 1.4023
+epoch 4 : loss 4.2053
+epoch 5 : loss 1.2986
+epoch 6 : loss 2.4254
+epoch 7 : loss 2.3481
+epoch 8 : loss 1.4709
+epoch 9 : loss 0.9489
+2020-05-04 13:05
+epoch 10 : loss 2.1895
+2020-05-04 13:05
+epoch 0 : loss 3.0368
+epoch 1 : loss 2.4482
+epoch 2 : loss 1.7451
+epoch 3 : loss 3.8625
+epoch 4 : loss 3.3042
+epoch 5 : loss 3.5403
+epoch 6 : loss 1.5326
+epoch 7 : loss 2.3634
+epoch 8 : loss 1.6427
+epoch 9 : loss 2.2247
+2020-05-04 15:05
+epoch 10 : loss 2.7896
+epoch 11 : loss 3.0440
+epoch 12 : loss 2.7905
+epoch 13 : loss 1.5725
+epoch 14 : loss 2.5949
+epoch 15 : loss 2.2785
+epoch 16 : loss 1.9355
+epoch 17 : loss 3.6751
+epoch 18 : loss 1.7573
+epoch 19 : loss 2.0874
+2020-05-04 17:05
+epoch 20 : loss 1.3394
+epoch 21 : loss 2.6641
+epoch 22 : loss 1.9045
+epoch 23 : loss 2.6543
+epoch 24 : loss 1.2639
+epoch 25 : loss 1.8395
+epoch 26 : loss 1.5102
+epoch 27 : loss 1.2869
+epoch 28 : loss 1.7895
+epoch 29 : loss 1.4958
+2020-05-04 18:05
+epoch 30 : loss 1.7799
+epoch 31 : loss 1.6786
+epoch 32 : loss 1.5650
+epoch 33 : loss 1.4432
+epoch 34 : loss 1.1181
+epoch 35 : loss 1.8866
+epoch 36 : loss 1.4362
+epoch 37 : loss 4.1358
+epoch 38 : loss 2.4119
+epoch 39 : loss 0.7260
+2020-05-04 20:05
+epoch 40 : loss 2.0242
+epoch 41 : loss 1.4380
+epoch 42 : loss 1.4354
+epoch 43 : loss 0.9319
+epoch 44 : loss 1.9276
+epoch 45 : loss 1.8073
+epoch 46 : loss 2.2780
+epoch 47 : loss 1.2458
+epoch 48 : loss 1.5578
+epoch 49 : loss 1.7831
+2020-05-04 22:05
+2020-05-07 10:05
+BatchSize:  32  , lr : 0 
+2020-05-07 10:05
+BatchSize:  32  , lr : 0 
+2020-05-07 10:05
+BatchSize:  32  , lr : 0 
+2020-05-07 10:05
+BatchSize:  32  , lr : 0 
+2020-05-10 05:05
+BatchSize:  32  , lr : 0 
+2020-05-10 05:05
+BatchSize:  32  , lr : 0 
+2020-05-10 05:05
+BatchSize:  32  , lr : 0 
+2020-05-10 05:05
+BatchSize:  32  , lr : 0 
+epoch 0 : loss 0.9975
+epoch 1 : loss 1.2715
+2020-05-10 05:05
+BatchSize:  16  , lr : 0 
+epoch 0 : loss 15.5108
+epoch 1 : loss 14.0192
+epoch 2 : loss 8.4490
+epoch 3 : loss 6.0072
+epoch 4 : loss 6.8453
+epoch 5 : loss 6.0338
+epoch 6 : loss 9.8510
+epoch 7 : loss 2.7743
+epoch 8 : loss 2.7262
+epoch 9 : loss 4.9681
+2020-05-10 05:05
+epoch 10 : loss 3.3573
+epoch 11 : loss 2.9214
+epoch 12 : loss 3.2027
+epoch 13 : loss 3.4828
+epoch 14 : loss 2.7412
+epoch 15 : loss 2.7749
+epoch 16 : loss 4.5432
+epoch 17 : loss 3.6816
+epoch 18 : loss 3.5412
+epoch 19 : loss 3.0934
+2020-05-10 05:05
+epoch 20 : loss 3.1093
+epoch 21 : loss 3.1322
+epoch 22 : loss 2.0224
+epoch 23 : loss 5.1720
+epoch 24 : loss 2.3575
+epoch 25 : loss 3.5444
+epoch 26 : loss 2.8906
+epoch 27 : loss 3.3631
+epoch 28 : loss 2.4407
+epoch 29 : loss 2.8230
+2020-05-10 05:05
+epoch 30 : loss 5.2337
+epoch 31 : loss 3.4525
+epoch 32 : loss 3.3930
+epoch 33 : loss 3.1245
+epoch 34 : loss 2.3653
+epoch 35 : loss 3.0799
+epoch 36 : loss 3.3444
+epoch 37 : loss 2.2256
+epoch 38 : loss 3.7186
+epoch 39 : loss 2.7506
+2020-05-10 06:05
+epoch 40 : loss 3.0091
+epoch 41 : loss 2.9528
+epoch 42 : loss 2.5053
+epoch 43 : loss 1.8946
+epoch 44 : loss 2.5918
+epoch 45 : loss 3.5928
+epoch 46 : loss 3.2660
+epoch 47 : loss 3.0963
+epoch 48 : loss 2.3301
+epoch 49 : loss 3.9053
+2020-05-10 06:05
