@@ -7,8 +7,8 @@ from train import calculate_iou
 from collections import defaultdict
 import os
 
-labels_Path=DATASET_PATH + "labels_augmentation/"
-evoc_file='evoc.log'
+labels_Path=DATASET_PATH + "labels_for_eval/"
+evoc_file='eval_test.log'
 def caculate_ap(rec,prec,use_07_metric=False):
     if use_07_metric:
     # 11 point metric
@@ -45,7 +45,7 @@ def get_map(preds,target,VOC_CLASSES=CLASSES,threshold=0.5,use_07_metric=False,)
             ap = -1
             print('---class {} ap {}---'.format(class_,ap))
             aps += [ap]
-            break
+            continue
         #print(pred)
         image_ids = [x[0] for x in pred]
         confidence = np.array([float(x[1]) for x in pred])
@@ -72,6 +72,9 @@ def get_map(preds,target,VOC_CLASSES=CLASSES,threshold=0.5,use_07_metric=False,)
                     # compute overlaps
                     # intersection
                     overlaps = calculate_iou(bbgt,bb)
+                    # print(overlaps)
+                    # if overlaps<0.1:
+                    #   import pdb;pdb.set_trace()
                     if overlaps > threshold:
                         tp[d] = 1
                         BBGT.remove(bbgt) #这个框已经匹配到了，不能再匹配
@@ -79,6 +82,8 @@ def get_map(preds,target,VOC_CLASSES=CLASSES,threshold=0.5,use_07_metric=False,)
                             del target[(image_id,class_)] #删除没有box的键值
                         break
                 fp[d] = 1-tp[d]
+                # if fp[d]>0.8:
+                #     import pdb;pdb.set_trace()
             else:
                 fp[d] = 1
         fp = np.cumsum(fp)
@@ -127,7 +132,10 @@ def get_targets(filelist):
     return targets
 if __name__ == '__main__':   
     evoc_log=open(evoc_file,'a+')
-    evoc_log.write('*'*15+model_name+'*'*15+'\n')
+    # evoc_log.write('*'*15+model_name+'*'*15+'\n')
+    evoc_log.write('*'*5+"预测数据为labels，测试test文件和eval_voc函数"+'*'*5+'\n')
+    evoc_log.write('*'*15+"测试训练集"+'*'*15+'\n')
+    evoc_log.write('*'*5+"更换labels文件夹：由labels_aug-->labels"+'*'*5+'\n')
     filelist=os.listdir(BBOX_Pred_Path)
     # print(len(filelist))
     preds=get_preds(filelist)

@@ -1,0 +1,198 @@
+2020-05-10 15:05
+数据集：VOC2007
+---更新的训练集划分及修改bug后的代码,重新开始训练*--
+---训练集：未做数据增广的训练集---
+2020-05-10 15:05
+数据集：VOC2007
+---更新的训练集划分及修改bug后的代码,重新开始训练*--
+---训练集：未做数据增广的训练集---
+---训练集数量 1632
+---BatchSize:  32  , lr : 0 
+epoch 0 : loss 14.3825
+epoch 1 : loss 14.5049
+epoch 2 : loss 7.5453
+epoch 3 : loss 32.9400
+epoch 4 : loss 4.1086
+epoch 5 : loss 2.5094
+epoch 6 : loss 4.3492
+epoch 7 : loss 1.2572
+epoch 8 : loss 2.4481
+epoch 9 : loss 2.9895
+save model: YOLOv1_update_epoch10.pkl
+2020-05-10 15:05
+epoch 10 : loss 2.3523
+epoch 11 : loss 2.3573
+epoch 12 : loss 1.9422
+epoch 13 : loss 3.6659
+epoch 14 : loss 2.6062
+epoch 15 : loss 1.8039
+epoch 16 : loss 3.3054
+epoch 17 : loss 3.2106
+epoch 18 : loss 4.6565
+epoch 19 : loss 2.9835
+save model: YOLOv1_update_epoch20.pkl
+2020-05-10 15:05
+epoch 20 : loss 1.8253
+epoch 21 : loss 1.4609
+epoch 22 : loss 1.3812
+epoch 23 : loss 1.7544
+epoch 24 : loss 3.1329
+epoch 25 : loss 1.2915
+epoch 26 : loss 11.2233
+epoch 27 : loss 1.5715
+epoch 28 : loss 1.1968
+epoch 29 : loss 2.6341
+save model: YOLOv1_update_epoch30.pkl
+2020-05-10 15:05
+epoch 30 : loss 1.5885
+epoch 31 : loss 12.6906
+epoch 32 : loss 2.5440
+epoch 33 : loss 2.2431
+epoch 34 : loss 1.7011
+epoch 35 : loss 3.6010
+epoch 36 : loss 2.0916
+epoch 37 : loss 3.0358
+epoch 38 : loss 4.9476
+epoch 39 : loss 3.9438
+save model: YOLOv1_update_epoch40.pkl
+2020-05-10 16:05
+epoch 40 : loss 6.1661
+epoch 41 : loss 15.7168
+epoch 42 : loss 1.8900
+epoch 43 : loss 2.5229
+epoch 44 : loss 4.0611
+epoch 45 : loss 1.8877
+epoch 46 : loss 2.2250
+epoch 47 : loss 1.1451
+epoch 48 : loss 6.3930
+epoch 49 : loss 2.5202
+save model: YOLOv1_update_epoch50.pkl
+2020-05-10 16:05
+epoch 50 : loss 5.0086
+epoch 51 : loss 3.0691
+2020-05-10 16:05
+数据集：VOC2007
+---在低学习率训练50轮的模型基础上，调大学习率训练--
+---训练集：未做数据增广的训练集---
+---训练集数量 1632
+---BatchSize:  32  , lr : 0 
+epoch 0 : loss 5.7211
+epoch 1 : loss 2.3290
+epoch 2 : loss 1.2483
+epoch 3 : loss 0.9934
+epoch 4 : loss 4.0329
+epoch 5 : loss 0.5641
+epoch 6 : loss 1.4812
+epoch 7 : loss 1.8803
+epoch 8 : loss 0.4292
+epoch 9 : loss 4.4064
+save model: YOLOv1_update_epoch10.pkl
+2020-05-10 16:05
+epoch 10 : loss 0.9230
+epoch 11 : loss 1.0839
+epoch 12 : loss 3.3751
+epoch 13 : loss 0.4913
+epoch 14 : loss 3.3149
+epoch 15 : loss 0.1647
+epoch 16 : loss 1.1291
+epoch 17 : loss 0.3979
+epoch 18 : loss 1.7105
+epoch 19 : loss 4.9580
+save model: YOLOv1_update_epoch20.pkl
+2020-05-10 17:05
+epoch 20 : loss 0.7210
+epoch 21 : loss 4.3548
+epoch 22 : loss 1.3440
+epoch 23 : loss 0.4975
+epoch 24 : loss 6.2758
+epoch 25 : loss 1.1132
+epoch 26 : loss 1.3950
+epoch 27 : loss 4.3364
+epoch 28 : loss 0.6929
+epoch 29 : loss 3.9777
+save model: YOLOv1_update_epoch30.pkl
+2020-05-10 17:05
+epoch 30 : loss 0.1785
+epoch 31 : loss 0.8809
+epoch 32 : loss 2.8985
+epoch 33 : loss 1.2396
+epoch 34 : loss 0.6338
+epoch 35 : loss 7.0655
+epoch 36 : loss 1.3133
+epoch 37 : loss 0.7885
+epoch 38 : loss 1.4700
+epoch 39 : loss 1.6611
+save model: YOLOv1_update_epoch40.pkl
+2020-05-10 17:05
+epoch 40 : loss 7.6951
+epoch 41 : loss 3.3304
+epoch 42 : loss 0.7181
+epoch 43 : loss 4.0415
+epoch 44 : loss 0.3434
+epoch 45 : loss 6.3972
+epoch 46 : loss 0.3479
+epoch 47 : loss 0.9154
+epoch 48 : loss 5.5818
+epoch 49 : loss 1.8049
+save model: YOLOv1_update_epoch50.pkl
+2020-05-10 17:05
+epoch 50 : loss 4.3816
+epoch 51 : loss 5.4027
+epoch 52 : loss 3.8336
+epoch 53 : loss 9.8543
+epoch 54 : loss 8.4480
+epoch 55 : loss 0.6739
+epoch 56 : loss 4.7124
+epoch 57 : loss 1.1503
+epoch 58 : loss 6.2210
+epoch 59 : loss 8.4240
+save model: YOLOv1_update_epoch60.pkl
+2020-05-10 17:05
+epoch 60 : loss 0.4165
+epoch 61 : loss 13.5010
+epoch 62 : loss 4.3427
+epoch 63 : loss 0.9631
+epoch 64 : loss 1.0001
+epoch 65 : loss 1.3954
+epoch 66 : loss 2.5656
+epoch 67 : loss 1.6466
+epoch 68 : loss 3.0813
+epoch 69 : loss 2.3810
+save model: YOLOv1_update_epoch70.pkl
+2020-05-10 18:05
+epoch 70 : loss 2.7367
+epoch 71 : loss 5.5890
+epoch 72 : loss 1.4114
+epoch 73 : loss 2.9650
+epoch 74 : loss 0.3606
+epoch 75 : loss 2.6395
+epoch 76 : loss 0.3535
+epoch 77 : loss 5.4549
+epoch 78 : loss 0.1507
+epoch 79 : loss 3.9063
+save model: YOLOv1_update_epoch80.pkl
+2020-05-10 18:05
+epoch 80 : loss 1.6139
+epoch 81 : loss 0.9552
+epoch 82 : loss 0.3086
+epoch 83 : loss 1.4232
+epoch 84 : loss 5.6657
+epoch 85 : loss 1.4515
+epoch 86 : loss 4.9254
+epoch 87 : loss 0.2856
+epoch 88 : loss 0.9586
+epoch 89 : loss 1.2604
+save model: YOLOv1_update_epoch90.pkl
+2020-05-10 18:05
+epoch 90 : loss 5.3702
+epoch 91 : loss 0.8616
+epoch 92 : loss 5.5431
+epoch 93 : loss 0.1873
+epoch 94 : loss 0.6274
+epoch 95 : loss 1.8805
+epoch 96 : loss 0.8919
+epoch 97 : loss 1.2675
+epoch 98 : loss 3.4689
+epoch 99 : loss 6.2377
+save model: YOLOv1_update_epoch100.pkl
+2020-05-10 18:05

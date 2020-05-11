@@ -1,0 +1,68 @@
+*****预测数据为labels，测试test文件和eval_voc函数*****
+***************测试训练集***************
+*****更换labels文件夹：由labels_aug-->labels*****
+*****预测数据为labels，测试test文件和eval_voc函数*****
+***************测试训练集***************
+*****更换labels文件夹：由labels_aug-->labels*****
+*****预测数据为labels，测试test文件和eval_voc函数*****
+***************测试训练集***************
+*****更换labels文件夹：由labels_aug-->labels*****
+---class person ap 0.6295487562331561---
+---class bird ap 0.7224080034011504---
+---class cat ap 0.9075955701734357---
+---class cow ap 0.801411665444372---
+---class dog ap 0.8882975975200208---
+---class horse ap 0.8377486384658654---
+---class sheep ap 0.4125718731852235---
+---map 0.7427974434890319---
+*****预测数据为labels，测试test文件和eval_voc函数*****
+***************测试训练集***************
+*****更换labels文件夹：由labels_aug-->labels*****
+*****预测数据为labels，测试test文件和eval_voc函数*****
+***************测试训练集***************
+*****更换labels文件夹：由labels_aug-->labels*****
+*****预测数据为labels，测试test文件和eval_voc函数*****
+***************测试训练集***************
+*****更换labels文件夹：由labels_aug-->labels*****
+---class person ap 0.8740113061402723---
+---class bird ap 0.9395161290322581---
+---class cat ap 0.9651741293532339---
+---class cow ap 0.9375---
+---class dog ap 0.9673469387755104---
+---class horse ap 0.8768472906403941---
+---class sheep ap 0.9166666666666666---
+---map 0.9252946372297624---
+*****预测数据为labels，测试test文件和eval_voc函数*****
+***************测试训练集***************
+*****更换labels文件夹：由labels_aug-->labels*****
+*****预测数据为labels，测试test文件和eval_voc函数*****
+***************测试训练集***************
+*****更换labels文件夹：由labels_aug-->labels*****
+---class person ap 0.8740113061402723---
+---class bird ap 0.9395161290322581---
+---class cat ap 0.9651741293532339---
+---class cow ap 0.9375---
+---class dog ap 0.9673469387755104---
+---class horse ap 0.8768472906403941---
+---class sheep ap 0.9166666666666666---
+---map 0.9252946372297624---
+*****预测数据为labels，测试test文件和eval_voc函数*****
+***************测试训练集***************
+*****更换labels文件夹：由labels_aug-->labels*****
+*****预测数据为labels，测试test文件和eval_voc函数*****
+***************测试训练集***************
+*****更换labels文件夹：由labels_aug-->labels*****
+*****预测数据为labels，测试test文件和eval_voc函数*****
+***************测试训练集***************
+*****更换labels文件夹：由labels_aug-->labels*****
+*****预测数据为labels，测试test文件和eval_voc函数*****
+***************测试训练集***************
+*****更换labels文件夹：由labels_aug-->labels*****
+---class person ap 0.8620346536685229---
+---class bird ap 0.9873417721518988---
+---class cat ap 0.9480519480519481---
+---class cow ap 0.9607843137254902---
+---class dog ap 0.9705882352941176---
+---class horse ap 0.8915662650602411---
+---class sheep ap 0.9344262295081968---
+---map 0.9363990596372023---

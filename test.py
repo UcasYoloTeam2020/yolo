@@ -23,7 +23,7 @@ PRED_PATH='Pred_img/'
 Pre_Train='Train_pre/'
 NUM_BBOX = 2
 BBOX_Pred_Path=(DATASET_PATH+'bboxs_preds/')#预测输出的bbox文件夹
-model_name='YOLOv1_DataAug_epoch50.pkl'
+model_name='YOLOv1_epoch50.pkl'
 # 注意检查一下输入数据的格式，到底是xywh还是xyxy
 def labels2bbox(matrix):
     """
@@ -147,24 +147,28 @@ def clr_bbox_path():
   # os.mkdir(PRED_PATH)
 
 if __name__ == '__main__':
-    Train=False  #测试训练集
+    Train=True  #测试训练集
     val_dataloader = DataLoader(VOC2007(is_train=Train), batch_size=1, shuffle=False)
     model = torch.load("./models_pkl/"+model_name)  # 加载训练好的模型
+    print("model:",model_name)
     clr_bbox_path()#清除原来的bbox信息
     for i,(inputs,labels,filename) in enumerate(val_dataloader):
-
+        
         inputs = inputs.cuda()
+        if ''.join(filename)!='003948':
+            # import pdb;pdb.set_trace()
+            continue
         # 以下代码是测试labels2bbox函数的时候再用
-        # labels = labels.float().cuda()
-        # labels = labels.squeeze(dim=0)
-        # labels = labels.permute((1,2,0))
-        # bbox = labels2bbox(labels)
-        pred = model(inputs)  # pred的尺寸是(1,30,7,7)
-        pred = pred.squeeze(dim=0)  # 压缩为(30,7,7)
-        pred = pred.permute((1,2,0))  # 转换为(7,7,30)
+        labels = labels.float().cuda()
+        labels = labels.squeeze(dim=0)
+        labels = labels.permute((1,2,0))
+        bbox = labels2bbox(labels)
+        # pred = model(inputs)  # pred的尺寸是(1,30,7,7)
+        # pred = pred.squeeze(dim=0)  # 压缩为(30,7,7)
+        # pred = pred.permute((1,2,0))  # 转换为(7,7,30)
 
-        # ## 测试labels2bbox时，使用 labels作为labels2bbox2函数的输入
-        bbox = labels2bbox(pred)  # 此处可以用labels代替pred，测试一下输出的bbox是否和标签一样，从而检查labels2bbox函数是否正确。当然，还要注意将数据集改成训练集而不是测试集，因为测试集没有labels。
+        # # ## 测试labels2bbox时，使用 labels作为labels2bbox2函数的输入
+        # bbox = labels2bbox(pred)  # 此处可以用labels代替pred，测试一下输出的bbox是否和标签一样，从而检查labels2bbox函数是否正确。当然，还要注意将数据集改成训练集而不是测试集，因为测试集没有labels。
         save_imgbbox(bbox,filename)
         
         inputs = inputs.squeeze(dim=0)  # 输入图像的尺寸是(1,3,448,448),压缩为(3,448,448)

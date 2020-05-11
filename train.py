@@ -22,6 +22,7 @@ import time
 
 DATASET_PATH = 'VOCdevkit/VOC2007/'
 NUM_BBOX = 2
+labels_Path=DATASET_PATH + "labels_for_eval/"
 
 def convert_bbox2labels(bbox):
     """将bbox的(cls,x,y,w,h)数据转换为训练时方便计算Loss的数据形式(7,7,5*B+cls_num)
@@ -98,7 +99,7 @@ class VOC2007(Dataset):
         bbox = [float(x) for y in bbox for x in y]
         if len(bbox)%5!=0:
             raise ValueError("File:"+self.labelpath+self.filenames[item]+".txt"+"——bbox Extraction Error!")
-
+        ff=open(labels_Path+self.filenames[item]+".txt",'w')#保存[cls,xc,yc,w,h格式的标签]，方便评估map
         # 根据padding、图像增广等操作，将原始的bbox数据转换为修改后图像的bbox数据
         for i in range(len(bbox)//5):
             if padw != 0:
@@ -107,8 +108,10 @@ class VOC2007(Dataset):
             elif padh != 0:
                 bbox[i * 5 + 2] = (bbox[i * 5 + 2] * h + padh) / w
                 bbox[i * 5 + 4] = (bbox[i * 5 + 4] * h) / w
+            # import pdb;pdb.set_trace()
+            ff.write(' '.join([str(x) for x in bbox[i*5:i*5+5]])+'\n')#保存标签方便，评估模型map
             # 此处可以写代码验证一下，查看padding后修改的bbox数值是否正确，在原图中画出bbox检验
-
+        # labels_Path
         labels = convert_bbox2labels(bbox)  # 将所有bbox的(cls,x,y,w,h)数据转换为训练时方便计算Loss的数据形式(7,7,5*B+cls_num)
         # 此处可以写代码验证一下，经过convert_bbox2labels函数后得到的labels变量中储存的数据是否正确
         if labels is None:
@@ -165,18 +168,18 @@ class Loss_yolov1(nn.Module):
 
         # 可以考虑用矩阵运算进行优化，提高速度，为了准确起见，这里还是用循环
         for i in range(n_batch):  # batchsize循环
-            for n in range(7):  # x方向网格循环
-                for m in range(7):  # y方向网格循环
+            for m in range(7):  # x方向网格循环
+                for n in range(7):  # y方向网格循环
                     if labels[i,4,m,n]==1:# 如果包含物体
                         # 将数据(px,py,w,h)转换为(x1,y1,x2,y2)
                         # 先将px,py转换为cx,cy，即相对网格的位置转换为标准化后实际的bbox中心位置cx,xy
                         # 然后再利用(cx-w/2,cy-h/2,cx+w/2,cy+h/2)转换为xyxy形式，用于计算iou
-                        bbox1_pred_xyxy = ((pred[i,0,m,n]+m)/num_gridx - pred[i,2,m,n]/2,(pred[i,1,m,n]+n)/num_gridy - pred[i,3,m,n]/2,
-                                           (pred[i,0,m,n]+m)/num_gridx + pred[i,2,m,n]/2,(pred[i,1,m,n]+n)/num_gridy + pred[i,3,m,n]/2)
-                        bbox2_pred_xyxy = ((pred[i,5,m,n]+m)/num_gridx - pred[i,7,m,n]/2,(pred[i,6,m,n]+n)/num_gridy - pred[i,8,m,n]/2,
-                                           (pred[i,5,m,n]+m)/num_gridx + pred[i,7,m,n]/2,(pred[i,6,m,n]+n)/num_gridy + pred[i,8,m,n]/2)
-                        bbox_gt_xyxy = ((labels[i,0,m,n]+m)/num_gridx - labels[i,2,m,n]/2,(labels[i,1,m,n]+n)/num_gridy - labels[i,3,m,n]/2,
-                                        (labels[i,0,m,n]+m)/num_gridx + labels[i,2,m,n]/2,(labels[i,1,m,n]+n)/num_gridy + labels[i,3,m,n]/2)
+                        bbox1_pred_xyxy = ((pred[i,0,m,n]+n)/num_gridx - pred[i,2,m,n]/2,(pred[i,1,m,n]+m)/num_gridy - pred[i,3,m,n]/2,
+                                           (pred[i,0,m,n]+n)/num_gridx + pred[i,2,m,n]/2,(pred[i,1,m,n]+m)/num_gridy + pred[i,3,m,n]/2)
+                        bbox2_pred_xyxy = ((pred[i,5,m,n]+n)/num_gridx - pred[i,7,m,n]/2,(pred[i,6,m,n]+m)/num_gridy - pred[i,8,m,n]/2,
+                                           (pred[i,5,m,n]+n)/num_gridx + pred[i,7,m,n]/2,(pred[i,6,m,n]+m)/num_gridy + pred[i,8,m,n]/2)
+                        bbox_gt_xyxy = ((labels[i,0,m,n]+n)/num_gridx - labels[i,2,m,n]/2,(labels[i,1,m,n]+m)/num_gridy - labels[i,3,m,n]/2,
+                                        (labels[i,0,m,n]+n)/num_gridx + labels[i,2,m,n]/2,(labels[i,1,m,n]+m)/num_gridy + labels[i,3,m,n]/2)
                         iou1 = calculate_iou(bbox1_pred_xyxy,bbox_gt_xyxy)
                         iou2 = calculate_iou(bbox2_pred_xyxy,bbox_gt_xyxy)
                         # 选择iou大的bbox作为负责物体
@@ -246,29 +249,32 @@ class YOLOv1_resnet(nn.Module):
         input = self.Conn_layers(input)
         return input.reshape(-1, (5*NUM_BBOX+len(CLASSES)), 7, 7)  # 记住最后要reshape一下输出数据
 
-
-
+def train_info2log(trainlog,num_batch,batchsize,lr):
+    print(time.strftime('%Y-%m-%d %H:%m',time.localtime(time.time())),file=trainlog)
+    print('数据集：VOC2007',file=trainlog)
+    print("---在低学习率训练50轮的模型基础上，调大学习率训练--",file=trainlog)
+    print("---训练集：未做数据增广的训练集---",file=trainlog)
+    print("---训练集数量 %d"%(num_batch*batchsize),file=trainlog)
+    print("---BatchSize:  %d  , lr : %.8f "%(batchsize,lr),file=trainlog)
 
 
 if __name__ == '__main__':
 	 #设置使用的gpu
     os.environ['CUDA_VISIBLE_DEVICES']='1'   
-    trainlog = open('train.log', mode = 'a',encoding='utf-8')
-    print(time.strftime('%Y-%m-%d %H:%m',time.localtime(time.time())),file=trainlog)
-
-    epoch = 50
-    batchsize = 16
-    lr = 0.000005
-    print("BatchSize:  %d  , lr : %d "%(batchsize,lr),file=trainlog)
+    trainlog = open('train_new.log', mode = 'a',encoding='utf-8')
+    epoch = 100
+    batchsize = 32
+    lr = 0.001
     train_data = VOC2007()
     train_dataloader = DataLoader(VOC2007(is_train=True),batch_size=batchsize,collate_fn=my_collate,shuffle=True)
+    train_info2log(trainlog,len(train_dataloader),batchsize,lr)
     # pdb.set_trace()
     #用cpu训练
     # model = YOLOv1_resnet()
     
     #用gpu训练
     model = YOLOv1_resnet().cuda()
-    # model = torch.load("./models_pkl/YOLOv1_DataAug_epoch10.pkl")
+    model = torch.load("./models_pkl/YOLOv1_update_epoch50.pkl")
     # model.children()里是按模块(Sequential)提取的子模块，而不是具体到每个层，具体可以参见pytorch帮助文档
     # 冻结resnet34特征提取层，特征提取层不参与参数更新
     for layer in model.children():
@@ -318,7 +324,8 @@ if __name__ == '__main__':
             """
         print("epoch %d : loss %.4f"%(e,loss),file=trainlog)    
         if (e+1)%10==0:
-                torch.save(model,"./models_pkl/YOLOv1_update_epoch"+str(e+1)+".pkl")
+                torch.save(model,"./models_pkl/YOLOv1_bigger_epoch"+str(e+1)+".pkl")
+                print("save model: YOLOv1_update_epoch"+str(e+1)+".pkl",file=trainlog)
                 print(time.strftime('%Y-%m-%d %H:%m',time.localtime(time.time())),file=trainlog)
                 # compute_val_map(model)
 
