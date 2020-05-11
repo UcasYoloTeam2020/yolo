@@ -7,7 +7,7 @@ from train import calculate_iou
 from collections import defaultdict
 import os
 
-labels_Path=DATASET_PATH + "labels_for_eval/"
+labels_Path=DATASET_PATH + "labels_for_eval/"  #train代码中生成的标签文件，需要与train代码同步
 evoc_file='eval_test.log'
 def caculate_ap(rec,prec,use_07_metric=False):
     if use_07_metric:

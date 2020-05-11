@@ -17,12 +17,18 @@ import torchvision.models as tvmodel
 from torch.utils.data import Dataset, DataLoader, TensorDataset
 from torch.utils.data.dataloader import default_collate
 import time
+import shutil
 # import pdb #debug tool
 # import Exception #
 
 DATASET_PATH = 'VOCdevkit/VOC2007/'
 NUM_BBOX = 2
-labels_Path=DATASET_PATH + "labels_for_eval/"
+labels_for_eval_Path=DATASET_PATH + "labels_for_eval/"
+
+def clr_eval_label():    #清除用于评估map的labels文件夹标签
+  if os.path.exists(labels_for_eval_Path):
+     shutil.rmtree(labels_for_eval_Path)
+  os.mkdir(labels_for_eval_Path)
 
 def convert_bbox2labels(bbox):
     """将bbox的(cls,x,y,w,h)数据转换为训练时方便计算Loss的数据形式(7,7,5*B+cls_num)
@@ -51,7 +57,7 @@ def my_collate(batch):
       return (None,None,None)
     return default_collate(batch)
 class VOC2007(Dataset):
-    def __init__(self,is_train=True,is_aug=True):
+    def __init__(self,is_train=True,is_aug=True,mk_eval_label=False):
         """
         :param is_train: 调用的是训练集(True)，还是验证集(False)
         :param is_aug:  是否进行数据增广
@@ -63,11 +69,13 @@ class VOC2007(Dataset):
         else:
             with open(DATASET_PATH + "ImageSets/Main/val.txt", 'r') as f:
                 self.filenames = [x.strip() for x in f]
+        if mk_eval_label:
+            clr_eval_label()
                 # print(filenames)
         self.imgpath = DATASET_PATH + "JPEGImages_augmentation/"  # 原始图像所在的路径
         self.labelpath = DATASET_PATH + "labels_augmentation/"  # 图像对应的label文件(.txt文件)的路径
         self.is_aug = is_aug
-
+        self.mk_eval_label=mk_eval_label
 
     def __len__(self):
         return len(self.filenames)
@@ -99,7 +107,8 @@ class VOC2007(Dataset):
         bbox = [float(x) for y in bbox for x in y]
         if len(bbox)%5!=0:
             raise ValueError("File:"+self.labelpath+self.filenames[item]+".txt"+"——bbox Extraction Error!")
-        ff=open(labels_Path+self.filenames[item]+".txt",'w')#保存[cls,xc,yc,w,h格式的标签]，方便评估map
+        if self.mk_eval_label:
+         ff=open(labels_for_eval_Path+self.filenames[item]+".txt",'w')#保存[cls,xc,yc,w,h格式的标签]，方便评估map
         # 根据padding、图像增广等操作，将原始的bbox数据转换为修改后图像的bbox数据
         for i in range(len(bbox)//5):
             if padw != 0:
@@ -108,8 +117,8 @@ class VOC2007(Dataset):
             elif padh != 0:
                 bbox[i * 5 + 2] = (bbox[i * 5 + 2] * h + padh) / w
                 bbox[i * 5 + 4] = (bbox[i * 5 + 4] * h) / w
-            # import pdb;pdb.set_trace()
-            ff.write(' '.join([str(x) for x in bbox[i*5:i*5+5]])+'\n')#保存标签方便，评估模型map
+            if self.mk_eval_label:
+                ff.write(' '.join([str(x) for x in bbox[i*5:i*5+5]])+'\n')#保存标签，方便评估模型map
             # 此处可以写代码验证一下，查看padding后修改的bbox数值是否正确，在原图中画出bbox检验
         # labels_Path
         labels = convert_bbox2labels(bbox)  # 将所有bbox的(cls,x,y,w,h)数据转换为训练时方便计算Loss的数据形式(7,7,5*B+cls_num)
