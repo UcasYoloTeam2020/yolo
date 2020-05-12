@@ -37,19 +37,19 @@
 `若使用增广数据，需将train.py及test.py中的图片路径、标签路径、图片名称路径替换为增广后的路径`
 
 ## Train.py 更新说明：
-1.增广后个别数据，可能由于随机裁剪原因，部分数据标签的bbox中心在img边缘，宽度为0。程序报错。
+1. 增广后个别数据，可能由于随机裁剪原因，部分数据标签的bbox中心在img边缘，宽度为0。程序报错。
   添加my_collate函数，剔除无效数据。
-2.添加log输出。
+2. 添加log输出。
 
 ## Resnet_dilat文件说明from赵千帆
  可以直接调用文件中的resnet_dilat函数代替model.resnet32赋值给resnet。
 
 ## map计算更新说明：
-1.由于训练集训练的时候，对照片做了padding，然后做了归一化。为了避免在eval时，重新计算padding的参数。因此在数据集里面，添加了一个mk_eval_label标志位，用于确定是否保存padding后格式的标签。test测试时，可以将改标志位置True。保存标签。
-2.保存标签的位置在'VOCdevkit/VOC2007/labels_for_eval/‘
-3.test运行时，需要将mk_eval_labels置为True
-4.eval_voc运行时，需要将labels_path 替换为 VOCdevkit/VOC2007/labels_for_eval/ 再运行
--- 代码详细修改说明(更新的代码）
+1. 由于训练集训练的时候，对照片做了padding，然后做了归一化。为了避免在eval时，重新计算padding的参数。因此在数据集里面，添加了一个mk_eval_label标志位，用于确定是否保存padding后格式的标签。test测试时，可以将改标志位置True。保存标签。 
+2. 保存标签的位置在'VOCdevkit/VOC2007/labels_for_eval/‘ 
+3. test运行时，需要将mk_eval_labels置为True  
+4. eval_voc运行时，需要将labels_path 替换为 VOCdevkit/VOC2007/labels_for_eval/ 再运行 
+-- 代码详细修改说明(更新的代码） 
 - train数据集修改,分别在L26-32 L72-75 L79 L112 L122
 - test dataloader改为：val_dataloader = DataLoader(VOC2007(is_train=Train,mk_eval_label=True), batch_size=1, shuffle=False)
 - eval_voc 修改：labels_Path修改为VOCdevkit/VOC2007/labels_for_eval/
