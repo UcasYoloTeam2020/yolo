@@ -49,7 +49,7 @@
 2. 保存标签的位置在'VOCdevkit/VOC2007/labels_for_eval/‘ 
 3. test运行时，需要将mk_eval_labels置为True  
 4. eval_voc运行时，需要将labels_path 替换为 VOCdevkit/VOC2007/labels_for_eval/ 再运行 
-` 代码详细修改说明(更新的代码） 
+### 代码详细修改说明(更新的代码） 
 - train数据集修改,分别在L26-32 L72-75 L79 L112 L122
 - test dataloader改为：val_dataloader = DataLoader(VOC2007(is_train=Train,mk_eval_label=True), batch_size=1, shuffle=False)
 - eval_voc 修改：labels_Path修改为VOCdevkit/VOC2007/labels_for_eval/
