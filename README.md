@@ -10,6 +10,7 @@
 1. 模型训练及测试的数据集为VOC2007，数据集下载可运行download_voc07.sh  
  `chmod u+x download_voc07.sh`  
  `./download_voc07.sh`
+ `tar -xf VOCtrainval_06-Nov-2007.tar`
 2.  由于计算资源有限，我们仅使用了VOC2007中的7类目标，若要调整目标数量，需在train.py中修改CLASSES中的类别
 3. 提取VOC2007选择的类别标签信息，转成YOLOv1的标签，并保存训练集和验证集的数据列表：  
     `python xmlToLabels.py`
