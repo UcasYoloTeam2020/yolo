@@ -14,7 +14,7 @@
 2.  由于计算资源有限，我们仅使用了VOC2007中的7类目标，若要调整目标数量，需在train.py中修改CLASSES中的类别
 3. 提取VOC2007选择的类别标签信息，转成YOLOv1的标签，并保存训练集和验证集的数据列表：  
     `python xmlToLabels.py`
-4. 如需要在预训练模型上的训练集和验证集上训练和测试,执行以下命令：
+4. 如需要在预训练模型上的训练集和验证集上训练和测试,执行以下命令：   
   `cp pretrain_datalist/*.txt VOCdevkit/VOC2007/ImageSets/Main/`
 
 ##  训练
@@ -34,12 +34,12 @@
 - 测试YOLOv1_resnet：  
    `model = YOLOv1_resnet().cuda()`   
    `model.load_state_dict(torch.load("models_pth/YOLOv1_resnet_epoch50.pth"))`   
-- 测试YOLOv1_vgg:
+- 测试YOLOv1_vgg:   
    `model = YOLOv1_vgg().cuda()`   
    `model.load_state_dict(torch.load("../YOLOv1_vgg16_epoch50.pth"))`   
-- 测试YOLOv1_resnet_DataAug:
+- 测试YOLOv1_resnet_DataAug:    
 `model = YOLOv1_resnet().cuda()`   
-`model.load_state_dict(torch.load("models_pth/ YOLOv1_resnet_epoch50.pth"))`   
+`model.load_state_dict(torch.load("models_pth/YOLOv1_resnet_DataAug_epoch40.pth"))`   
 3. 测试：
 ` python test.py`   
 
