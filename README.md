@@ -1,5 +1,5 @@
 ##  概述
- 国科大19深度学习大作业。 
+- 国科大19深度学习大作业。 
   本次作业，我们拟实现目标检测经典算法YOLOV1的网络框架，并评估其性能。为此，我们参考了部分网络上YOLO V1相关的代码制作了本次作业的代码，实现了基于Resnet、VGG的YOLOV1框架，并在YOLOV1_resnet的基础上做了数据增广、focal loss和空洞卷积的尝试
 ##  运行环境
 - Pytorch : 1.0.0
@@ -20,7 +20,7 @@
 ##  训练
 1. 模型默认使用无增广数据集训练，如需数据增广，请先运行：  
 `python make_augmentation.py`  
-- 并更改VOC2007中训练数据列表及图片、标签位置分别为：  
+并更改VOC2007中训练数据列表及图片、标签位置分别为：  
 `ImageSets\Main\train_augmentation.txt
 JPEGImages_augmentation
 labels_augmentation`
@@ -31,6 +31,15 @@ labels_augmentation`
 链接：https://pan.baidu.com/s/1HdVBVkSBXjYLimKnSKRXDQ   
 提取码：w8n0   
 2. 选择测试的模型，并更改模型的的载入路径  
+- 测试YOLOv1_resnet：  
+   `model = YOLOv1_resnet().cuda()`
+   `model.load_state_dict(torch.load("models_pth/YOLOv1_resnet_epoch50.pth"))`
+- 测试YOLOv1_vgg:
+   `model = YOLOv1_vgg().cuda()`
+   `model.load_state_dict(torch.load("../YOLOv1_vgg16_epoch50.pth"))`
+- 测试YOLOv1_resnet_DataAug:
+`model = YOLOv1_resnet().cuda()`
+`model.load_state_dict(torch.load("models_pth/YOLOv1_resnet_epoch50.pth"))`
 3. ` python test.py`
 
 
