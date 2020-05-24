@@ -20,7 +20,7 @@ import time
 import shutil
 from yolo import Loss_yolov1,YOLOv1_resnet,YOLOv1_vgg,YOLOv1_dilat
 
-DATASET_PATH = 'VOCdevkit/VOC2007/'
+DATASET_PATH = '../YOLO/VOCdevkit/VOC2007/'
 NUM_BBOX = 2
 labels_for_eval_Path=DATASET_PATH + "labels_for_eval/"
 

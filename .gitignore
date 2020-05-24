@@ -1,0 +1,9 @@
+/Pred_img/
+/VOCdevkit/
+/models_pth/
+*.pth
+*.pkl
+*.jpg
+*.tar
+
+

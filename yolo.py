@@ -112,7 +112,7 @@ class YOLOv1_resnet(nn.Module):
         super(YOLOv1_resnet,self).__init__()
         
         resnet = tvmodel.resnet34(pretrained=True)
-        resnet.load_state_dict(torch.load('./models_pkl/resnet34-333f7ec4.pth'),False)
+        # resnet.load_state_dict(torch.load('./models_pkl/resnet34-333f7ec4.pth'),False)
 
         resnet_out_channel = resnet.fc.in_features  # 记录resnet全连接层之前的网络输出通道数，方便连入后续卷积网络中
 

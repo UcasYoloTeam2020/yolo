@@ -1,14 +1,12 @@
 # 新的xmltolabels,以便于数据增广
 # CLASSES = ['person', 'bird', 'cat', 'cow', 'dog', 'horse', 'sheep']
-CLASSES = ['person', 'bird', 'cat', 'cow', 'dog', 'horse', 'sheep',
-          'aeroplane', 'bicycle', 'boat', 'bus', 'car', 'motorbike', 'train',
-          'bottle', 'chair', 'diningtable', 'pottedplant', 'sofa', 'tvmonitor']
-# print(len(CLASSES))
+# # print(len(CLASSES))
 import xml.etree.ElementTree as ET
 import os
 import cv2
 import random
 import shutil
+from train import CLASSES
 
 # 为了方便数据增广，这部分函数其实没用
 def convert(size, box):
@@ -49,7 +47,7 @@ def convert_annotation(DATASET_PATH,image_id):
     for obj in root.iter('object'):
         difficult = obj.find('difficult').text
         cls = obj.find('name').text
-        if cls not in CLASSES:
+        if cls not in CLASSES or int(difficult) == 1:
             continue
         no_cls = False
         cls_id = CLASSES.index(cls)
@@ -57,11 +55,11 @@ def convert_annotation(DATASET_PATH,image_id):
         points = (float(xmlbox.find('xmin').text), float(xmlbox.find('xmax').text), float(xmlbox.find('ymin').text),
              float(xmlbox.find('ymax').text))
         bb = convert((w, h), points)
-        with open(DATASET_PATH+'labels_20/%s.txt' % (image_id), 'a+') as out_file:
+        with open(DATASET_PATH+'labels/%s.txt' % (image_id), 'a+') as out_file:
             out_file.write(str(cls_id) + " " + " ".join([str(a) for a in bb]) + '\n')
     
     if no_cls == False:
-        if random.random()<0.7:
+        if random.random()<0.5:
             with open(DATASET_PATH+"ImageSets/Main/train.txt",'a+') as f:
                 f.write(image_id.split('.')[0]+'\n')
         else:

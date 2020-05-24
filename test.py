@@ -10,7 +10,7 @@ import torchvision.models as tvmodel
 from torch.utils.data import Dataset, DataLoader, TensorDataset
 
 import eval_voc
-from train import VOC2007
+from train import VOC2007,DATASET_PATH
 from yolo import YOLOv1_resnet,YOLOv1_vgg,YOLOv1_dilat,calculate_iou,Loss_yolov1
 import shutil
 #为了加快计算，只用了7类，
@@ -19,7 +19,7 @@ CLASSES = ['person', 'bird', 'cat', 'cow', 'dog', 'horse', 'sheep']
 #           'aeroplane', 'bicycle', 'boat', 'bus', 'car', 'motorbike', 'train',
 #           'bottle', 'chair', 'diningtable', 'pottedplant', 'sofa', 'tvmonitor']
 
-DATASET_PATH = 'VOCdevkit/VOC2007/'
+# DATASET_PATH = 'VOCdevkit/VOC2007/'
 PRED_PATH='Pred_img/'
 NUM_BBOX = 2
 BBOX_Pred_Path=(DATASET_PATH+'bboxs_preds/')#预测输出的bbox文件夹
@@ -142,31 +142,31 @@ if __name__ == '__main__':
 
     #vgg16作为backbone训练的模型
     # model = YOLOv1_vgg().cuda()
-    # model.load_state_dict(torch.load("../YOLOv1_vgg16_epoch50.pth"))
+    # model.load_state_dict(torch.load("models_pth/YOLOv1_vgg16_epoch50.pth"))
 
     #resnet 作为backbone训练的模型
-    # model = YOLOv1_resnet().cuda()
-    # model.load_state_dict(torch.load("../YOLOv1_resnet_epoch50.pth"))
-    # #resnet 作为backbone增广后训练的模型
     model = YOLOv1_resnet().cuda()
-    model.load_state_dict(torch.load("../YOLOv1_resnet_DataAug_epoch40.pth"))
+    model.load_state_dict(torch.load("models_pth/YOLOv1_resnet_epoch50.pth"))
+    # #resnet 作为backbone增广后训练的模型
+    # model = YOLOv1_resnet().cuda()
+    # model.load_state_dict(torch.load("models_pth/YOLOv1_resnet_DataAug_epoch40.pth"))
 
     clr_bbox_path()#清除原来的bbox信息
     model.eval()
     for i,(inputs,labels,filename) in enumerate(val_dataloader):
         inputs = inputs.cuda()
-        pred = model(inputs)  # pred的尺寸是(1,17,7,7)
-        pred = pred.squeeze(dim=0)  # 压缩为(17,7,7)
-        pred = pred.permute((1,2,0))  # 转换为(7,7,17)
-        bbox = labels2bbox(pred)  # 此处可以用labels代替pred，测试一下输出的bbox是否和标签一样，从而检查labels2bbox函数是否正确。当然，还要注意将数据集改成训练集而不是测试集，因为测试集没有labels。
+        pred = model(inputs)  
+        pred = pred.squeeze(dim=0)  #
+        pred = pred.permute((1,2,0))  
+        bbox = labels2bbox(pred)  
         save_imgbbox(bbox,filename)#保存预测的bbox信息，以便于模型评估时使用
         
-        inputs = inputs.squeeze(dim=0)  # 输入图像的尺寸是(1,3,448,448),压缩为(3,448,448)
-        inputs = inputs.permute((1,2,0))  # 转换为(448,448,3)
+        inputs = inputs.squeeze(dim=0)  
+        inputs = inputs.permute((1,2,0))  
         img = inputs.cpu().numpy()
-        img = 255*img  # 将图像的数值从(0,1)映射到(0,255)并转为非负整形
+        img = 255*img  
         img = img.astype(np.uint8)
-        img_bbox=draw_bbox(img,bbox.cpu())  # 输出带有bbox的img图像
+        img_bbox=draw_bbox(img,bbox.cpu())  
 
         cv2.imwrite(PRED_PATH+''.join(filename)+'.jpg',img_bbox)
         print("测试图片 %s"%(filename))
